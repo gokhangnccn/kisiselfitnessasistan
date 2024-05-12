@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.gokhan.kfa"
-    compileSdk = 34
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.gokhan.kfa"
