@@ -15,10 +15,18 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        </activity>
+        <activity
+            android:name=".KayitEkrani"
+            android:exported="true">
+        </activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <activity
+              android:name=".GirisEkrani"
+              android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
