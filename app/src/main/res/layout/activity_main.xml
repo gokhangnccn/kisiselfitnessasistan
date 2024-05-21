@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selamun Aleyküm Gym Kardeşim"
+        android:text="Ana Ekran"
         android:textSize="32dp"
         android:fontFamily="sans-serif-medium"
         android:layout_centerInParent="true"/>
