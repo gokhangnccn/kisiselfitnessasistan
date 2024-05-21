@@ -38,9 +38,14 @@ class KayitEkrani : AppCompatActivity() {
                     }
 
             } else {
-                Toast.makeText(this, "Empty Fields Are not Allowed !!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lütfen bilgileri doldurunuz!", Toast.LENGTH_SHORT).show()
 
             }
+        }
+
+        binding.girisyap.setOnClickListener{
+            val intent2 = Intent(this, GirisEkrani::class.java)
+            startActivity(intent2)
         }
     }
 }

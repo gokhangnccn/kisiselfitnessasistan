@@ -9,4 +9,8 @@
     <color name="secondary2">#DFD0B8</color>
     <color name="light_pink">#F0CBF6</color>
     <color name="gray">#433A45</color>
+
+    <color name="primary3">#CE3A2828</color>
+    <color name="primary4">#CE3A2830</color>
+    <color name="light_red">#F6CBCB</color>
 </resources>

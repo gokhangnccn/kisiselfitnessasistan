@@ -126,14 +126,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="10dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/giris"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:text="Giriş"
-                app:cornerRadius="32dp"
-                android:backgroundTint="@color/gray"
-                android:textColor="@color/light_pink"/>
+                android:orientation="horizontal"
+
+                android:weightSum="2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/girisyap"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/gray"
+                    android:text="Giriş Yap"
+                    android:textColor="@color/light_pink"
+                    app:cornerRadius="32dp" />
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/kayitol"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/gray"
+                    android:text="Kayıt Ol"
+                    android:textColor="@color/light_pink"
+                    app:cornerRadius="32dp" />
+            </LinearLayout>
 
             <View
                 android:layout_width="wrap_content"
