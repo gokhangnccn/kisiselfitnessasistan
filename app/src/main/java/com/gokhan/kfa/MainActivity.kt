@@ -1,8 +1,8 @@
 package com.gokhan.kfa
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.gokhan.kfa.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -18,12 +18,30 @@ class MainActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        binding.buttonCikis.setOnClickListener {
-            firebaseAuth.signOut()
-            val intent = Intent(this, GirisEkrani::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            when(item.itemId) {
+                R.id.menu -> {
+                    replaceFragment(Menu())
+                    true
+                }
+                R.id.profile -> {
+                    replaceFragment(Profile())
+                    true
+                }
+                else -> false
+            }
         }
+
+        // Ensure only one fragment is initialized
+        if (savedInstanceState == null) {
+            binding.bottomNavigationView.selectedItemId = R.id.menu
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.frame_layout, fragment)
+        fragmentTransaction.commit()
     }
 }

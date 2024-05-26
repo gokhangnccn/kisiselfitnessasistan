@@ -29,29 +29,28 @@ class GirisEkrani : AppCompatActivity() {
                     if (it.isSuccessful) {
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
+                        finish() // Finish GirisEkrani so user can't go back to it
                     } else {
                         Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
-
                     }
                 }
             } else {
                 Toast.makeText(this, "Lütfen bilgileri doldurunuz!", Toast.LENGTH_SHORT).show()
-
             }
         }
-        binding.kayitol.setOnClickListener{
+
+        binding.kayitol.setOnClickListener {
             val intent2 = Intent(this, KayitEkrani::class.java)
             startActivity(intent2)
         }
     }
 
-
     override fun onStart() {
         super.onStart()
-
-        if(firebaseAuth.currentUser != null){
+        if (firebaseAuth.currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finish() // Finish GirisEkrani so user can't go back to it
         }
     }
 }
