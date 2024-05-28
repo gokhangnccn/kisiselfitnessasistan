@@ -19,20 +19,20 @@ class MainActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
 
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
-            when(item.itemId) {
+            when (item.itemId) {
                 R.id.menu -> {
-                    replaceFragment(Menu())
+                    replaceFragment(Menu.newInstance("", ""))  // Assuming Menu fragment uses parameters
                     true
                 }
                 R.id.profile -> {
-                    replaceFragment(Profile())
+                    replaceFragment(Profile.newInstance())
                     true
                 }
                 else -> false
             }
         }
 
-        // Ensure only one fragment is initialized
+// Set default fragment
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.menu
         }
