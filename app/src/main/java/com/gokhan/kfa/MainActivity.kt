@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-// Set default fragment
+        // Set default fragment
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.menu
         }
