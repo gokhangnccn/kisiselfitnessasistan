@@ -1,0 +1,9 @@
+<!-- edit_text_border_error.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@android:color/transparent" />
+    <stroke
+        android:width="2dp"
+        android:color="#FF0000" /> <!-- Kırmızı çerçeve -->
+    <corners android:radius="8dp" /> <!-- İstenirse köşeleri yuvarlatmak için -->
+</shape>

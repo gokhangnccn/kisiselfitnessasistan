@@ -56,9 +56,11 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:21.0.0")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.theartofdev.edmodo:android-image-cropper:2.8.+")
+    implementation("com.github.bumptech.glide:glide:4.11.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
     implementation("com.google.android.material:material:1.4.0")
     testImplementation("junit:junit:4.13.2")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
