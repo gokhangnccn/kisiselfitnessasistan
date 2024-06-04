@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@color/c2">
+
+    <TextView
+        android:id="@+id/tv_exercise_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Egzersiz Adı"
+        android:textColor="@color/c3"
+        android:textSize="18sp"/>
+
+    <CheckBox
+        android:id="@+id/checkbox_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/c3"/>
+</LinearLayout>

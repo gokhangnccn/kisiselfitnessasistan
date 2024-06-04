@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="8dp"
     android:textSize="16sp"
-    android:textColor="@color/primary2"
+    android:textColor="@color/c2"
     android:textStyle="bold"
     android:gravity="center_vertical" />
 

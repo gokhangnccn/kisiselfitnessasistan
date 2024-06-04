@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/c2"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tv_routine_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rutin Adı"
+        android:textColor="@color/c3"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/btn_start_routine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rutini Başlat"
+        android:textColor="@color/c3"/>
+</LinearLayout>

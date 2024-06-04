@@ -13,8 +13,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Base_Theme_KFA) // veya uygun bir tema
-        val binding: ActivityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+        setTheme(R.style.Base_Theme_KFA)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         firebaseAuth = FirebaseAuth.getInstance()
@@ -22,18 +22,21 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.menu -> {
-                    replaceFragment(Menu.newInstance("", ""))  // Assuming Menu fragment uses parameters
+                    replaceFragment(Menu.newInstance("param1_value", "param2_value"))
                     true
                 }
                 R.id.profile -> {
                     replaceFragment(Profile.newInstance())
                     true
                 }
+                R.id.antrenman -> {
+                    replaceFragment(Antrenman.newInstance())
+                    true
+                }
                 else -> false
             }
         }
 
-        // Set default fragment
         if (savedInstanceState == null) {
             binding.bottomNavigationView.selectedItemId = R.id.menu
         }
@@ -41,9 +44,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
-        val fragmentTransaction
-        = fragmentManager.beginTransaction()
+        val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.frame_layout, fragment)
         fragmentTransaction.commit()
     }
+
+
 }
