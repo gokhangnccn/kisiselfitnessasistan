@@ -3,6 +3,7 @@
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
+android:background="@color/c1"
 tools:context=".Menu">
 
 <!-- TODO: Update blank fragment layout -->
@@ -10,13 +11,16 @@ tools:context=".Menu">
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Burası Ana Menü"
-    android:background="@color/light_pink"
+    android:textSize="24sp"
+    android:textColor="@color/c3"
+    android:background="@color/c2"
     android:layout_gravity="center" />
 
 <Button
     android:id="@+id/buttonCikis"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:textColor="@color/c4"
     android:text="Çıkış Yap"
     android:layout_marginTop="40dp"
     android:layout_gravity="center"/>

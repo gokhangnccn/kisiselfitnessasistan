@@ -43,6 +43,12 @@ class GirisEkrani : AppCompatActivity() {
             val intent2 = Intent(this, KayitEkrani::class.java)
             startActivity(intent2)
         }
+
+
+        binding.sifremiUnuttum.setOnClickListener {
+            val intent = Intent(this, SifremiUnuttum::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onStart() {
