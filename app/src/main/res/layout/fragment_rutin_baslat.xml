@@ -1,8 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Action Bar -->
     <LinearLayout
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
@@ -48,31 +48,26 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
-    <!-- Egzersiz Seçim -->
-    <LinearLayout
+    <!-- Rutindeki Egzersizlerin Gösterildiği Bölüm -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_routine_exercises"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_below="@id/action_bar">
+        android:layout_below="@id/action_bar"
+        android:background="@color/c1"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"/>
 
-        <!-- RecyclerView for Active Exercises -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_aktif_egzersizler"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/c1" />
-
-        <!-- Egzersiz Ekle Butonu -->
-        <Button
-            android:id="@+id/btn_rutine_egzersiz_ekle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Egzersiz Ekle"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/c1"
-            android:textColor="@color/c4" />
-    </LinearLayout>
-
+    <!-- Egzersiz Ekle Butonu -->
+    <Button
+        android:id="@+id/btn_rutine_egzersiz_ekle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rv_routine_exercises"
+        android:layout_alignParentEnd="true"
+        android:text="Egzersiz Ekle"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/c1"
+        android:textColor="@color/c4" />
 </RelativeLayout>

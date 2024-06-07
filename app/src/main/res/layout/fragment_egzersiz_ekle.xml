@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/egzersiz_ekle">
+
+    <!-- Egzersizlerin Listelendiği RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_egzersiz_listesi"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/c1"
+        android:padding="16dp"/>
+
+    <!-- Seçimi Tamamla Butonu -->
+    <Button
+        android:id="@+id/btn_complete_selection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seçimi Tamamla"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/c1"
+        android:textColor="@color/c4" />
+</RelativeLayout>
