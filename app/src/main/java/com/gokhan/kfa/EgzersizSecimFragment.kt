@@ -1,25 +1,27 @@
 package com.gokhan.kfa
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gokhan.kfa.databinding.FragmentEgzersizSecimBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 class EgzersizSecimFragment : Fragment() {
 
     private var _binding: FragmentEgzersizSecimBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: FirebaseFirestore
-    private val exercises = mutableListOf<Egzersiz>()
+    private val selectedRoutineExercises = mutableListOf<Egzersiz>()
     private lateinit var exerciseAdapter: EgzersizAdapter
     private var routineId: String? = null
-    private var selectedRoutine: Routine? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,74 +29,196 @@ class EgzersizSecimFragment : Fragment() {
     ): View {
         _binding = FragmentEgzersizSecimBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
-        routineId = arguments?.getString("routineId")
         return binding.root
-    }
-
-    companion object {
-        private const val ARG_ROUTINE_ID = "routineId"
-
-        fun newInstance(routineId: String): EgzersizSecimFragment {
-            val fragment = EgzersizSecimFragment()
-            val args = Bundle()
-            args.putString(ARG_ROUTINE_ID, routineId)
-            fragment.arguments = args
-            return fragment
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        routineId = arguments?.getString("routineId")
         init()
     }
 
     private fun init() {
         binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(exercises) { exercise ->
+        exerciseAdapter = EgzersizAdapter(selectedRoutineExercises) { exercise ->
             // Handle exercise click if needed
         }
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
-        fetchExercisesForRoutine()
 
         binding.btnRutineEgzersizEkle.setOnClickListener {
-            if (selectedRoutine != null) {
-                val fragment = EgzersizEkleFragment.newInstance(selectedRoutine!!.id)
+            routineId?.let {
                 fragmentManager?.beginTransaction()
-                    ?.replace(R.id.frame_layout, fragment)
+                    ?.replace(R.id.frame_layout, EgzersizEkleFragment.newInstance(it))
                     ?.addToBackStack(null)
                     ?.commit()
-            } else {
-                Toast.makeText(context, "Lütfen bir rutin seçin", Toast.LENGTH_SHORT).show()
             }
         }
 
+        binding.btnRutineEgzersizSil.setOnClickListener {
+            deleteSelectedExerciseFromList()
+        }
+
+        // Find the edit button and set its OnClickListener
+        binding.btnEditRoutine.setOnClickListener {
+            routineId?.let { id ->
+                showEditRoutineDialog(id)
+            }
+        }
+        routineId?.let { id ->
+            db.collection("routines").document(id).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val routine = document.toObject(Routine::class.java)
+                        routine?.let {
+                            // Rutin adını ve açıklamasını güncelle
+                            binding.tvRoutineName.text = it.name
+                            binding.tvRoutineDescription.text = it.description
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("EgzersizSecimFragment", "Error fetching routine details", e)
+                }
+        }
+        fetchRoutineExercisesFromFirestore()
     }
 
-    private fun fetchExercisesForRoutine() {
-        routineId?.let { id ->
-            db.collection("routines").document(id).collection("exercises").get()
+    private fun showEditRoutineDialog(routineId: String) {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_routine, null)
+        val etRoutineName = dialogView.findViewById<EditText>(R.id.et_routine_name)
+        val etRoutineDescription = dialogView.findViewById<EditText>(R.id.et_routine_description)
+
+        // Pre-fill the dialog with current routine details
+        db.collection("routines").document(routineId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val routine = document.toObject(Routine::class.java)
+                    routine?.let {
+                        etRoutineName.setText(it.name)
+                        etRoutineDescription.setText(it.description)
+                        // Güncellemeyi menüde de yap
+                        binding.tvRoutineName.text = it.name
+                        binding.tvRoutineDescription.text = it.description
+                    }
+                }
+            }
+
+        val dialog = AlertDialog.Builder(context, R.style.Theme_KFA)
+            .setTitle("Rutini Düzenle")
+            .setView(dialogView)
+            .setPositiveButton("Kaydet") { _, _ ->
+                val newName = etRoutineName.text.toString()
+                val newDescription = etRoutineDescription.text.toString()
+
+                if (newName.isNotEmpty() && newDescription.isNotEmpty()) {
+                    updateRoutineDetails(routineId, newName, newDescription)
+                    // Firestore'dan güncellenmiş bilgileri alarak kullanıcı arayüzünü güncelle
+                    fetchRoutineExercisesFromFirestore()
+                } else {
+                    Toast.makeText(context, "Lütfen tüm alanları doldurun", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            .setNegativeButton("İptal", null)
+            .create()
+
+        dialog.show()
+    }
+
+
+    private fun updateRoutineDetails(routineId: String, newName: String, newDescription: String) {
+        val routineRef = db.collection("routines").document(routineId)
+        val updates = mapOf(
+            "name" to newName,
+            "description" to newDescription
+        )
+
+        routineRef.set(updates, SetOptions.merge())
+            .addOnSuccessListener {
+                Toast.makeText(context, "Rutin başarıyla güncellendi", Toast.LENGTH_SHORT).show()
+                fetchUpdatedRoutineDetails(routineId)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Rutin güncellenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+    private fun fetchUpdatedRoutineDetails(routineId: String) {
+        db.collection("routines").document(routineId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val routine = document.toObject(Routine::class.java)
+                    routine?.let {
+                        // Rutin adını ve açıklamasını güncelle
+                        binding.tvRoutineName.text = it.name
+                        binding.tvRoutineDescription.text = it.description
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("EgzersizSecimFragment", "Error fetching updated routine details", e)
+            }
+    }
+    private fun fetchRoutineExercisesFromFirestore() {
+        routineId?.let { routineId ->
+            db.collection("routines").document(routineId).collection("exercises").get()
                 .addOnSuccessListener { result ->
-                    exercises.clear()
+                    val routineExercises = mutableListOf<Egzersiz>()
                     for (document in result) {
                         val exercise = document.toObject(Egzersiz::class.java)
                         exercise.id = document.id
-                        exercises.add(exercise)
+                        routineExercises.add(exercise)
                     }
+                    selectedRoutineExercises.clear()
+                    selectedRoutineExercises.addAll(routineExercises)
                     exerciseAdapter.notifyDataSetChanged()
                 }
                 .addOnFailureListener { e ->
-                    Log.w("EgzersizSecimFragment", "Error fetching exercises for routine", e)
+                    Log.w("EgzersizSecimFragment", "Error fetching routine exercises", e)
                 }
         }
     }
 
-    fun onRoutineSelected(routine: Routine) {
-        selectedRoutine = routine
-        fetchExercisesForRoutine()
+
+    private fun deleteSelectedExerciseFromList() {
+        val selectedExercises = exerciseAdapter.getSelectedExercises()
+        if (selectedExercises.isEmpty()) {
+            Toast.makeText(context, "Lütfen silmek için egzersiz seçin", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Rutine Id'sini kontrol et
+        routineId?.let { routineId ->
+            val batch = db.batch()
+            for (exercise in selectedExercises) {
+                val exerciseRef = db.collection("routines").document(routineId)
+                    .collection("exercises").document(exercise.id)
+                batch.delete(exerciseRef)
+            }
+            batch.commit()
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Seçilen egzersizler başarıyla silindi", Toast.LENGTH_SHORT).show()
+                    fetchRoutineExercisesFromFirestore()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Seçilen egzersizler silinirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        fun newInstance(routineId: String): EgzersizSecimFragment {
+            val fragment = EgzersizSecimFragment()
+            val args = Bundle().apply {
+                putString("routineId", routineId)
+            }
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

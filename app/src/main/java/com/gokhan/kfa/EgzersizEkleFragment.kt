@@ -79,15 +79,38 @@ class EgzersizEkleFragment : Fragment() {
 
     private fun addExerciseToRoutine(exercise: Egzersiz) {
         routineId?.let { id ->
-            db.collection("routines").document(id).collection("exercises").add(exercise)
+            db.collection("routines").document(id).collection("exercises").document(exercise.id)
+                .set(exercise)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Egzersiz başarıyla eklendi", Toast.LENGTH_SHORT).show()
+                    fetchRoutineExercisesFromFirestore() // Egzersiz ekledikten sonra listeyi güncelle
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, "Egzersiz eklenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
+
+    private fun fetchRoutineExercisesFromFirestore() {
+        routineId?.let { routineId ->
+            db.collection("routines").document(routineId).collection("exercises").get()
+                .addOnSuccessListener { result ->
+                    val routineExercises = mutableListOf<Egzersiz>()
+                    for (document in result) {
+                        val exercise = document.toObject(Egzersiz::class.java)
+                        exercise.id = document.id
+                        routineExercises.add(exercise)
+                    }
+                    allExercises.clear()
+                    allExercises.addAll(routineExercises)
+                    exerciseAdapter.notifyDataSetChanged()
+                }
+                .addOnFailureListener { e ->
+                    Log.w("EgzersizEkleFragment", "Error fetching routine exercises", e)
+                }
+        }
+    }
+
 
     private fun addSelectedExercisesToRoutine() {
         val selectedExercises = exerciseAdapter.getSelectedExercises()
@@ -100,6 +123,9 @@ class EgzersizEkleFragment : Fragment() {
             batch.commit()
                 .addOnSuccessListener {
                     Toast.makeText(context, "Seçilen egzersizler başarıyla eklendi", Toast.LENGTH_SHORT).show()
+                    fetchRoutineExercisesFromFirestore()
+                    activity?.supportFragmentManager?.popBackStack()
+
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, "Seçilen egzersizler eklenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -107,9 +133,9 @@ class EgzersizEkleFragment : Fragment() {
         }
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
-

@@ -1,5 +1,6 @@
 package com.gokhan.kfa
 
+
 import RoutineAdapter
 import android.app.AlertDialog
 import android.os.Bundle
@@ -66,6 +67,7 @@ class Antrenman : Fragment() {
             ?.addToBackStack(null)
             ?.commit()
     }
+
 
     private fun showCreateRoutineDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_create_routine, null)

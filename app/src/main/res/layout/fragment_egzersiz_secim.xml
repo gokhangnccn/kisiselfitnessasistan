@@ -63,16 +63,32 @@
             android:layout_height="wrap_content"
             android:background="@color/c1" />
 
-        <!-- Egzersiz Ekle Butonu -->
-        <Button
-            android:id="@+id/btn_rutine_egzersiz_ekle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Egzersiz Ekle"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/c1"
-            android:textColor="@color/c4" />
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btn_rutine_egzersiz_ekle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Egzersiz Ekle"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/c1"
+                android:textColor="@color/c4" />
+
+            <Button
+                android:id="@+id/btn_rutine_egzersiz_sil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Egzersizi Sil"
+                android:backgroundTint="@color/c1"
+                android:textColor="@color/c4" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>
