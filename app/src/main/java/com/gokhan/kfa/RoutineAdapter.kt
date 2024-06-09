@@ -10,7 +10,6 @@ import com.gokhan.kfa.Routine
 
 class RoutineAdapter(
     private val routines: MutableList<Routine>,
-    private val onRoutineSelected: (Routine) -> Unit,
     private val onStartRoutineClicked: (Routine) -> Unit
 ) : RecyclerView.Adapter<RoutineAdapter.RoutineViewHolder>() {
 
@@ -40,9 +39,6 @@ class RoutineAdapter(
             } else {
                 selectedRoutines.remove(currentRoutine)
             }
-        }
-        holder.itemView.setOnClickListener {
-            onRoutineSelected(currentRoutine)
         }
         holder.startRoutineButton.setOnClickListener {
             onStartRoutineClicked(currentRoutine)

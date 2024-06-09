@@ -49,9 +49,14 @@ class EgzersizEkleFragment : Fragment() {
 
     private fun init() {
         binding.rvEgzersizListesi.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(allExercises) { exercise ->
-            addExerciseToRoutine(exercise)
-        }
+        exerciseAdapter = EgzersizAdapter(allExercises,
+            onExerciseClicked = { exercise ->
+
+            },
+            onInfoClicked = { exercise ->
+                context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
+            }
+        )
         binding.rvEgzersizListesi.adapter = exerciseAdapter
 
         fetchExercisesFromFirestore()
@@ -60,6 +65,9 @@ class EgzersizEkleFragment : Fragment() {
             addSelectedExercisesToRoutine()
         }
     }
+
+
+
 
     private fun fetchExercisesFromFirestore() {
         db.collection("exercises").get()
@@ -75,20 +83,6 @@ class EgzersizEkleFragment : Fragment() {
             .addOnFailureListener { e ->
                 Log.w("EgzersizEkleFragment", "Error fetching exercises", e)
             }
-    }
-
-    private fun addExerciseToRoutine(exercise: Egzersiz) {
-        routineId?.let { id ->
-            db.collection("routines").document(id).collection("exercises").document(exercise.id)
-                .set(exercise)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Egzersiz başarıyla eklendi", Toast.LENGTH_SHORT).show()
-                    fetchRoutineExercisesFromFirestore() // Egzersiz ekledikten sonra listeyi güncelle
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, "Egzersiz eklenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
     }
 
     private fun fetchRoutineExercisesFromFirestore() {
@@ -111,9 +105,13 @@ class EgzersizEkleFragment : Fragment() {
         }
     }
 
-
     private fun addSelectedExercisesToRoutine() {
         val selectedExercises = exerciseAdapter.getSelectedExercises()
+        if (selectedExercises.isEmpty()) {
+            Toast.makeText(context, "Lütfen eklemek için en az bir egzersiz seçin", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         routineId?.let { id ->
             val batch = db.batch()
             selectedExercises.forEach { exercise ->
@@ -125,7 +123,6 @@ class EgzersizEkleFragment : Fragment() {
                     Toast.makeText(context, "Seçilen egzersizler başarıyla eklendi", Toast.LENGTH_SHORT).show()
                     fetchRoutineExercisesFromFirestore()
                     activity?.supportFragmentManager?.popBackStack()
-
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(context, "Seçilen egzersizler eklenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()

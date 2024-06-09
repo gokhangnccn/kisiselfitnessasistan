@@ -20,7 +20,7 @@
         android:text="Seçimi Tamamla"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/c1"
-        android:textColor="@color/c4" />
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/y2"
+        android:textColor="@color/c1" />
 </RelativeLayout>

@@ -1,23 +1,35 @@
 package com.gokhan.kfa
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextPaint
+import android.text.style.ClickableSpan
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.gokhan.kfa.databinding.ItemEgzersizSecimBinding
 
 class EgzersizAdapter(
     private val exercises: MutableList<Egzersiz>,
-    private val onExerciseClicked: (Egzersiz) -> Unit
+    private val onExerciseClicked: (Egzersiz) -> Unit,
+    private val onInfoClicked: (Egzersiz) -> Unit
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
     private val selectedExercises = mutableSetOf<Egzersiz>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EgzersizViewHolder {
         val binding = ItemEgzersizSecimBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return EgzersizViewHolder(binding)
+        return EgzersizViewHolder(binding, onInfoClicked)
     }
 
     override fun onBindViewHolder(holder: EgzersizViewHolder, position: Int) {
@@ -47,32 +59,102 @@ class EgzersizAdapter(
         notifyDataSetChanged()
     }
 
-
-    class EgzersizViewHolder(private val binding: ItemEgzersizSecimBinding) : RecyclerView.ViewHolder(binding.root) {
+    class EgzersizViewHolder(
+        private val binding: ItemEgzersizSecimBinding,
+        private val onInfoClicked: (Egzersiz) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         val checkBox: CheckBox = binding.cbSelectExercise
 
         fun bind(exercise: Egzersiz) {
             binding.tvExerciseName.text = exercise.name
-            binding.tvExerciseDescription.text = exercise.description
+            binding.tvExerciseDescription.text = getTruncatedDescription(exercise.description)
+            binding.tvExerciseDescription.setOnClickListener {
+                onInfoClicked(exercise)
+            }
             binding.tvTargetMuscles.text = "Hedef Kaslar: ${exercise.targetMuscleGroups?.joinToString(", ")}"
+            binding.tvSecondaryMuscles.text = "Yardımcı Kaslar: ${exercise.secondaryTargetMuscleGroups?.joinToString(", ")}"
 
             val width = 300
             val height = 300
 
             Glide.with(binding.root)
-                .asGif()
+                .asGif()  // Ensure you are loading it as a GIF
                 .load(exercise.gifUrl)
                 .apply(
                     RequestOptions()
-                        .override(width, height)
-                        .fitCenter()
+                        .override(width, height)  // Specify width and height as required
+                        .fitCenter()  // Adjust the scale type to fit center
+                        .placeholder(R.drawable.gymicon)  // Add a placeholder image
+                        .error(R.drawable.baseline_image_not_supported_24)  // Add an error image
                 )
+                .listener(object : RequestListener<GifDrawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        e?.logRootCauses("Glide")
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: GifDrawable?,
+                        model: Any?,
+                        target: Target<GifDrawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        resource?.setLoopCount(GifDrawable.LOOP_INTRINSIC)  // Set loop count
+                        return false
+                    }
+                })
                 .into(binding.ivExerciseIcon)
 
+            binding.infoLayout.setOnClickListener {
+                onInfoClicked(exercise)
+            }
+            binding.ivInfo.setOnClickListener {
+                onInfoClicked(exercise)
+            }
+            binding.ivInfoText.setOnClickListener {
+                onInfoClicked(exercise)
+            }
+
+        }
+
+        private fun getTruncatedDescription(description: String): SpannableString {
+            val maxLength = 110
+            val readMoreText = " ... Devamını Oku"
+
+            return if (description.length > maxLength) {
+                val truncatedText = "${description.substring(0, maxLength)}$readMoreText"
+                val spannableString = SpannableString(truncatedText)
+
+                val clickableSpan = object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        // Tam açıklamayı göstermek için gerekli işlemler
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        super.updateDrawState(ds)
+                        val readMoreColor = ContextCompat.getColor(itemView.context, R.color.c3)
+                        val alphaColor = readMoreColor and 0x00ffffff or (128 shl 24)
+                        ds.color = alphaColor
+                        ds.isUnderlineText = false
+                    }
+
+
+                }
+
+                val startIndex = truncatedText.indexOf(readMoreText)
+                spannableString.setSpan(clickableSpan, startIndex, startIndex + readMoreText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                spannableString
+            } else {
+                SpannableString(description)
+            }
         }
 
     }
 }
-
-
-

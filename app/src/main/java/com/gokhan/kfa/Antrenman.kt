@@ -1,6 +1,5 @@
 package com.gokhan.kfa
 
-
 import RoutineAdapter
 import android.app.AlertDialog
 import android.os.Bundle
@@ -43,12 +42,8 @@ class Antrenman : Fragment() {
 
     private fun init() {
         binding.rvRoutines.layoutManager = LinearLayoutManager(context)
-        routineAdapter = RoutineAdapter(routines, this::onRoutineSelected, this::onStartRoutineClicked)
+        routineAdapter = RoutineAdapter(routines, this::onStartRoutineClicked)
         binding.rvRoutines.adapter = routineAdapter
-
-        exerciseAdapter = EgzersizAdapter(exercises) { exercise ->
-            // Handle exercise click if needed
-        }
 
         binding.btnAddRoutine.setOnClickListener {
             showCreateRoutineDialog()
@@ -67,7 +62,6 @@ class Antrenman : Fragment() {
             ?.addToBackStack(null)
             ?.commit()
     }
-
 
     private fun showCreateRoutineDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_create_routine, null)
@@ -122,27 +116,6 @@ class Antrenman : Fragment() {
             }
     }
 
-    private fun onRoutineSelected(routine: Routine) {
-        selectedRoutine = routine
-        fetchExercisesForRoutine(routine.id)
-    }
-
-    private fun fetchExercisesForRoutine(routineId: String) {
-        db.collection("routines").document(routineId).collection("exercises").get()
-            .addOnSuccessListener { result ->
-                exercises.clear()
-                for (document in result) {
-                    val exercise = document.toObject(Egzersiz::class.java)
-                    exercise.id = document.id
-                    exercises.add(exercise)
-                }
-                exerciseAdapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener { e ->
-                Log.w("Antrenman", "Error fetching exercises for routine", e)
-            }
-    }
-
     private fun deleteSelectedRoutines() {
         val selectedRoutines = routineAdapter.getSelectedRoutines()
         if (selectedRoutines.isEmpty()) {
@@ -176,4 +149,3 @@ class Antrenman : Fragment() {
         }
     }
 }
-

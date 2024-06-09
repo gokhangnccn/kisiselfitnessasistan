@@ -6,10 +6,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.gokhan.kfa.databinding.FragmentEgzersizSecimBinding
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -29,20 +32,71 @@ class EgzersizSecimFragment : Fragment() {
     ): View {
         _binding = FragmentEgzersizSecimBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         routineId = arguments?.getString("routineId")
+
+        val scrollDownIcon: ImageView = view.findViewById(R.id.scroll_down_icon)
+        val recyclerView: RecyclerView = view.findViewById(R.id.rv_aktif_egzersizler)
+
+        // Scroll listener to show/hide the scroll down icon
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val totalItemCount = recyclerView.layoutManager?.itemCount ?: 0
+                val lastVisibleItemPosition = (recyclerView.layoutManager as? LinearLayoutManager)?.findLastVisibleItemPosition() ?: 0
+
+                if (lastVisibleItemPosition == totalItemCount - 1) {
+                    fadeOutView(scrollDownIcon)
+                } else {
+                    fadeInView(scrollDownIcon)
+                }
+            }
+        })
+
+        scrollDownIcon.setOnClickListener {
+            recyclerView.smoothScrollToPosition(recyclerView.adapter?.itemCount?.minus(1) ?: 0)
+        }
+
         init()
     }
 
+    private fun fadeInView(view: View) {
+        if (view.visibility != View.VISIBLE) {
+            val fadeInAnimation = AlphaAnimation(0f, 1f)
+            fadeInAnimation.duration = 300
+            view.startAnimation(fadeInAnimation)
+            view.visibility = View.VISIBLE
+        }
+    }
+
+    private fun fadeOutView(view: View) {
+        if (view.visibility == View.VISIBLE) {
+            val fadeOutAnimation = AlphaAnimation(1f, 0f)
+            fadeOutAnimation.duration = 300
+            view.startAnimation(fadeOutAnimation)
+            view.visibility = View.GONE
+        }
+    }
+
+
+
+
+
     private fun init() {
         binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(selectedRoutineExercises) { exercise ->
-            // Handle exercise click if needed
-        }
+        exerciseAdapter = EgzersizAdapter(selectedRoutineExercises,
+            onExerciseClicked = { exercise ->
+                // Handle exercise click if needed
+            },
+            onInfoClicked = { exercise ->
+                context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
+            }
+        )
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
 
         binding.btnRutineEgzersizEkle.setOnClickListener {
@@ -80,6 +134,7 @@ class EgzersizSecimFragment : Fragment() {
                     Log.e("EgzersizSecimFragment", "Error fetching routine details", e)
                 }
         }
+
         fetchRoutineExercisesFromFirestore()
     }
 
@@ -113,7 +168,7 @@ class EgzersizSecimFragment : Fragment() {
                 if (newName.isNotEmpty() && newDescription.isNotEmpty()) {
                     updateRoutineDetails(routineId, newName, newDescription)
                     // Firestore'dan güncellenmiş bilgileri alarak kullanıcı arayüzünü güncelle
-                    fetchRoutineExercisesFromFirestore()
+                    fetchUpdatedRoutineDetails(routineId)
                 } else {
                     Toast.makeText(context, "Lütfen tüm alanları doldurun", Toast.LENGTH_SHORT).show()
                 }
@@ -135,11 +190,12 @@ class EgzersizSecimFragment : Fragment() {
 
         routineRef.set(updates, SetOptions.merge())
             .addOnSuccessListener {
-                Toast.makeText(context, "Rutin başarıyla güncellendi", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Rutin güncellendi", Toast.LENGTH_SHORT).show()
                 fetchUpdatedRoutineDetails(routineId)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Rutin güncellenirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("EgzersizSecimFragment", "Error updating routine details", e)
+                Toast.makeText(context, "Rutin güncellenirken bir hata oluştu", Toast.LENGTH_SHORT).show()
             }
     }
     private fun fetchUpdatedRoutineDetails(routineId: String) {
@@ -178,7 +234,6 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 
-
     private fun deleteSelectedExerciseFromList() {
         val selectedExercises = exerciseAdapter.getSelectedExercises()
         if (selectedExercises.isEmpty()) {
@@ -205,20 +260,17 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
-        fun newInstance(routineId: String): EgzersizSecimFragment {
-            val fragment = EgzersizSecimFragment()
-            val args = Bundle().apply {
+        @JvmStatic
+        fun newInstance(routineId: String) = EgzersizSecimFragment().apply {
+            arguments = Bundle().apply {
                 putString("routineId", routineId)
             }
-            fragment.arguments = args
-            return fragment
         }
     }
 }
