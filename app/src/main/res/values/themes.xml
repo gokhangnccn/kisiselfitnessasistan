@@ -1,12 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.KFA" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/primary2</item>
-        <item name="colorPrimaryDark">@color/primary2</item>
+        <item name="colorPrimary">@color/c2</item>
+        <item name="colorPrimaryDark">@color/c2</item>
+        <item name="android:statusBarColor">@color/c1</item> <!-- Durum çubuğu rengi -->
     </style>
 
     <style name="Theme.KFA" parent="Base.Theme.KFA" />
-
-
-
 </resources>

@@ -1,24 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-tools:context=".Menu">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/c1"
+    tools:context=".EgzersizEkleFragment">
 
-<!-- TODO: Update blank fragment layout -->
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Burası Ana Menü"
-    android:background="@color/light_pink"
-    android:layout_gravity="center" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Egzersiz Ekle"
+        android:textSize="24sp"
+        android:textColor="@color/c3"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"/>
 
-<Button
-    android:id="@+id/buttonCikis"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Çıkış Yap"
-    android:layout_marginTop="40dp"
-    android:layout_gravity="center"/>
 
-</FrameLayout>
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="İsim"/>
+
+    <EditText
+        android:id="@+id/editTextDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Açıklama"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextEquipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ekipman"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextNasilYapilir"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nasıl Yapılır"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextTargetMuscleGroups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hedef Kas Grupları (Virgülle Ayırın)"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextSecondaryTargetMuscleGroups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="İkincil Hedef Kas Grupları (Virgülle Ayırın)"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/editTextGifUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="GIF URL"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/buttonEkle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ekle"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"/>
+    <Button
+        android:id="@+id/button_cikis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cikis"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>

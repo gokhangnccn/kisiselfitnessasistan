@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/c1"
+    android:padding="16dp"
+    tools:context=".Antrenman">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rutinler"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/c3"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRoutines"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:background="@color/c2" />
+
+    <Button
+        android:id="@+id/btn_add_routine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Yeni Rutin Ekle"
+        android:textColor="@color/c3"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/btn_delete_routine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seçili Rutinleri Sil"
+        android:textColor="@color/c3"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>

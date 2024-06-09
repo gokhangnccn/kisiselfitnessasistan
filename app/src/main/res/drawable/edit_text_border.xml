@@ -4,6 +4,6 @@
     <solid android:color="@android:color/transparent" />
     <stroke
         android:width="2dp"
-        android:color="@color/primary3" /> <!-- EditText'in çerçeve rengi -->
+        android:color="@color/c3" /> <!-- EditText'in çerçeve rengi -->
     <corners android:radius="8dp" /> <!-- Köşelerin yuvarlatılması için -->
 </shape>

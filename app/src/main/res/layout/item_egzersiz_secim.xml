@@ -1,0 +1,135 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@drawable/item_border"
+    android:divider="?android:attr/dividerHorizontal"
+    android:showDividers="middle"
+    android:focusable="true"
+    android:layout_marginBottom="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="16dp">
+
+        <ImageView
+            android:id="@+id/iv_exercise_icon"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:src="@drawable/gymicon"
+            android:scaleType="centerCrop"
+            android:elevation="4dp"
+            android:layout_marginEnd="8dp"
+            android:padding="4dp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_exercise_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Exercise Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/c3"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/tv_exercise_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Exercise Description"
+                android:textSize="14sp"
+                android:textColor="@color/c4"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="sans-serif-light" />
+        </LinearLayout>
+
+        <!-- Info Button with Text Below -->
+        <LinearLayout
+            android:id="@+id/info_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="4dp"
+            android:gravity="center_horizontal"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="onInfoClicked">
+
+            <ImageView
+                android:id="@+id/iv_info"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/baseline_info_24"
+                android:contentDescription="Bilgi"
+                android:tooltipText="Bilgi"
+                app:tint="@color/c4" />
+
+            <TextView
+                android:id="@+id/iv_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detay"
+                android:textColor="@color/c4"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_target_muscles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Target Muscles:"
+        android:textColor="@color/c4"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="14sp"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tv_secondary_muscles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Secondary Muscles:"
+        android:textColor="@color/c4"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="14sp"
+        android:paddingBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp"
+        android:paddingTop="4dp"
+        android:divider="?android:attr/dividerVertical"
+        android:showDividers="middle">
+
+        <CheckBox
+            android:id="@+id/cb_select_exercise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seç"
+            android:textColor="@color/c4"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:buttonTint="@color/c4" />
+    </LinearLayout>
+</LinearLayout>

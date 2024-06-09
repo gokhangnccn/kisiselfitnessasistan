@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_exercise_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exercise Name"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_exercise_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Exercise Description"
+        android:textSize="14sp" />
+
+    <CheckBox
+        android:id="@+id/checkbox_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/c3"/>
+</LinearLayout>

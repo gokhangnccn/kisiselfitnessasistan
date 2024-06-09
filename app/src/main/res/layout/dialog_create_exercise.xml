@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/et_exercise_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Egzersiz Adı" />
+
+    <EditText
+        android:id="@+id/et_exercise_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Egzersiz Açıklaması" />
+
+    <EditText
+        android:id="@+id/et_exercise_gif_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="GIF Yükle: " />
+
+
+
+    <EditText
+        android:id="@+id/et_exercise_target_muscles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hedef Kas Grupları (virgülle ayırarak)" />
+
+    <Button
+        android:id="@+id/btn_create"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Oluştur"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
