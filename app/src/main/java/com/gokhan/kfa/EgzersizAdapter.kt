@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -18,17 +19,24 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.gokhan.kfa.databinding.ItemEgzersizSecimBinding
+import com.gokhan.kfa.databinding.ItemRutinEgzersiziBinding
+
 
 class EgzersizAdapter(
     private val exercises: MutableList<Egzersiz>,
     private val onExerciseClicked: (Egzersiz) -> Unit,
-    private val onInfoClicked: (Egzersiz) -> Unit
+    private val onInfoClicked: (Egzersiz) -> Unit,
+    private val isRoutineExercise: Boolean // Yeni parametre
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
     private val selectedExercises = mutableSetOf<Egzersiz>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EgzersizViewHolder {
-        val binding = ItemEgzersizSecimBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = if (isRoutineExercise) {
+            ItemRutinEgzersiziBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        } else {
+            ItemEgzersizSecimBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        }
         return EgzersizViewHolder(binding, onInfoClicked)
     }
 
@@ -60,67 +68,121 @@ class EgzersizAdapter(
     }
 
     class EgzersizViewHolder(
-        private val binding: ItemEgzersizSecimBinding,
+        private val binding: ViewBinding, // Generic ViewBinding
         private val onInfoClicked: (Egzersiz) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        val checkBox: CheckBox = binding.cbSelectExercise
+        val checkBox: CheckBox = if (binding is ItemEgzersizSecimBinding) binding.cbSelectExercise else (binding as ItemRutinEgzersiziBinding).cbSetCompleted
 
         fun bind(exercise: Egzersiz) {
-            binding.tvExerciseName.text = exercise.name
-            binding.tvExerciseDescription.text = getTruncatedDescription(exercise.description)
-            binding.tvExerciseDescription.setOnClickListener {
-                onInfoClicked(exercise)
-            }
-            binding.tvTargetMuscles.text = "Hedef Kaslar: ${exercise.targetMuscleGroups?.joinToString(", ")}"
-            binding.tvSecondaryMuscles.text = "Yardımcı Kaslar: ${exercise.secondaryTargetMuscleGroups?.joinToString(", ")}"
+            when (binding) {
+                is ItemEgzersizSecimBinding -> {
+                    binding.tvExerciseName.text = exercise.name
+                    binding.tvExerciseDescription.text = getTruncatedDescription(exercise.description)
+                    binding.tvExerciseDescription.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                    binding.tvTargetMuscles.text = "Hedef Kaslar: ${exercise.targetMuscleGroups?.joinToString(", ")}"
+                    binding.tvSecondaryMuscles.text = "Yardımcı Kaslar: ${exercise.secondaryTargetMuscleGroups?.joinToString(", ")}"
+                    val width = 300
+                    val height = 300
 
-            val width = 300
-            val height = 300
+                    Glide.with(binding.root)
+                        .asGif()
+                        .load(exercise.gifUrl)
+                        .apply(
+                            RequestOptions()
+                                .override(width, height)
+                                .fitCenter()
+                                .placeholder(R.drawable.gymicon)
+                                .error(R.drawable.baseline_image_not_supported_24)
+                        )
+                        .listener(object : RequestListener<GifDrawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<GifDrawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                e?.logRootCauses("Glide")
+                                return false
+                            }
 
-            Glide.with(binding.root)
-                .asGif()  // Ensure you are loading it as a GIF
-                .load(exercise.gifUrl)
-                .apply(
-                    RequestOptions()
-                        .override(width, height)  // Specify width and height as required
-                        .fitCenter()  // Adjust the scale type to fit center
-                        .placeholder(R.drawable.gymicon)  // Add a placeholder image
-                        .error(R.drawable.baseline_image_not_supported_24)  // Add an error image
-                )
-                .listener(object : RequestListener<GifDrawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<GifDrawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        e?.logRootCauses("Glide")
-                        return false
+                            override fun onResourceReady(
+                                resource: GifDrawable?,
+                                model: Any?,
+                                target: Target<GifDrawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                resource?.setLoopCount(GifDrawable.LOOP_INTRINSIC)
+                                return false
+                            }
+                        })
+                        .into(binding.ivExerciseIcon)
+                    binding.infoLayout.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                    binding.ivInfo.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                    binding.ivInfoText.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                }
+                is ItemRutinEgzersiziBinding -> {
+                    binding.tvExerciseName.text = exercise.name
+                    binding.tvExerciseDescription.text = getTruncatedDescription(exercise.description)
+                    binding.tvExerciseDescription.setOnClickListener {
+                        onInfoClicked(exercise)
                     }
 
-                    override fun onResourceReady(
-                        resource: GifDrawable?,
-                        model: Any?,
-                        target: Target<GifDrawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        resource?.setLoopCount(GifDrawable.LOOP_INTRINSIC)  // Set loop count
-                        return false
+                    val width = 300
+                    val height = 300
+
+                    Glide.with(binding.root)
+                        .asGif()
+                        .load(exercise.gifUrl)
+                        .apply(
+                            RequestOptions()
+                                .override(width, height)
+                                .fitCenter()
+                                .placeholder(R.drawable.gymicon)
+                                .error(R.drawable.baseline_image_not_supported_24)
+                        )
+                        .listener(object : RequestListener<GifDrawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<GifDrawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                e?.logRootCauses("Glide")
+                                return false
+                            }
+
+                            override fun onResourceReady(
+                                resource: GifDrawable?,
+                                model: Any?,
+                                target: Target<GifDrawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                resource?.setLoopCount(GifDrawable.LOOP_INTRINSIC)
+                                return false
+                            }
+                        })
+                        .into(binding.ivExerciseIcon)
+                    binding.infoLayout.setOnClickListener {
+                        onInfoClicked(exercise)
                     }
-                })
-                .into(binding.ivExerciseIcon)
-
-            binding.infoLayout.setOnClickListener {
-                onInfoClicked(exercise)
+                    binding.ivInfo.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                    binding.ivInfoText.setOnClickListener {
+                        onInfoClicked(exercise)
+                    }
+                }
             }
-            binding.ivInfo.setOnClickListener {
-                onInfoClicked(exercise)
-            }
-            binding.ivInfoText.setOnClickListener {
-                onInfoClicked(exercise)
-            }
-
         }
 
         private fun getTruncatedDescription(description: String): SpannableString {
@@ -143,8 +205,6 @@ class EgzersizAdapter(
                         ds.color = alphaColor
                         ds.isUnderlineText = false
                     }
-
-
                 }
 
                 val startIndex = truncatedText.indexOf(readMoreText)
@@ -155,6 +215,5 @@ class EgzersizAdapter(
                 SpannableString(description)
             }
         }
-
     }
 }

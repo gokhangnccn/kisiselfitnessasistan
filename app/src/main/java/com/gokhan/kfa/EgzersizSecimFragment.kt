@@ -84,18 +84,17 @@ class EgzersizSecimFragment : Fragment() {
     }
 
 
-
-
-
     private fun init() {
         binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(selectedRoutineExercises,
+        exerciseAdapter = EgzersizAdapter(
+            selectedRoutineExercises,
             onExerciseClicked = { exercise ->
                 // Handle exercise click if needed
             },
             onInfoClicked = { exercise ->
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
-            }
+            },
+            isRoutineExercise = true // Egzersiz seçim menüsü için true
         )
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
 
@@ -137,6 +136,7 @@ class EgzersizSecimFragment : Fragment() {
 
         fetchRoutineExercisesFromFirestore()
     }
+
 
     private fun showEditRoutineDialog(routineId: String) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_routine, null)

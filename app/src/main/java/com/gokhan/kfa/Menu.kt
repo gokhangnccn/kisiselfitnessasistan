@@ -18,20 +18,21 @@ class Menu : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        setHasOptionsMenu(true)  // Enable the options menu in the fragment
         val view = inflater.inflate(R.layout.fragment_menu, container, false)
 
-        // Find the button and set an OnClickListener
+
         val buttonCikis: Button = view.findViewById(R.id.button_cikis)
         buttonCikis.setOnClickListener {
-            // Log out from Firebase
+
             FirebaseAuth.getInstance().signOut()
 
-            // Navigate to the login screen
+
             val intent = Intent(activity, GirisEkrani::class.java)
             startActivity(intent)
-            activity?.finish() // Finish the current activity to remove it from the back stack
+            activity?.finish()
         }
+
 
         val db = Firebase.firestore
 

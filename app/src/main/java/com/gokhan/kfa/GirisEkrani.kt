@@ -29,7 +29,7 @@ class GirisEkrani : AppCompatActivity() {
                     if (it.isSuccessful) {
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
-                        finish() // Finish GirisEkrani so user can't go back to it
+                        finish()
                     } else {
                         Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
                     }
@@ -56,7 +56,7 @@ class GirisEkrani : AppCompatActivity() {
         if (firebaseAuth.currentUser != null) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-            finish() // Finish GirisEkrani so user can't go back to it
+            finish()
         }
     }
 }
