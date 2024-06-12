@@ -22,17 +22,17 @@ class KayitEkrani : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        // Initialize Firebase Auth
+
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // Initialize views
+
         emailEditText = findViewById(R.id.email)
         passwordEditText = findViewById(R.id.sifre)
         nameEditText = findViewById(R.id.ad)
         registerButton = findViewById(R.id.kayitol)
         zatenKayiliyim = findViewById(R.id.zatenKayitliyim)
 
-        // Register button click listener
+
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()

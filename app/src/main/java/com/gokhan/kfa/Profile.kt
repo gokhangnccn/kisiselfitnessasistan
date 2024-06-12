@@ -2,33 +2,29 @@ package com.gokhan.kfa
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.core.content.ContextCompat
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import com.bumptech.glide.Glide
-import com.google.firebase.firestore.SetOptions
 
 
 class Profile : Fragment() {
@@ -177,8 +173,8 @@ class Profile : Fragment() {
         }
 
         changePasswordButton.setOnClickListener {
-            // Handle password change logic
-            // This can involve sending a password reset email or opening a new fragment/dialog for password change
+            //daha yapılmadı daha sonra yapılacak şifre değiştirme işlevi
+
         }
 
         saveButton.setOnClickListener {
@@ -221,34 +217,6 @@ class Profile : Fragment() {
     }
 
 
-
-    private fun saveUserInfo() {
-        val age = ageSpinner.selectedItem.toString()
-        val weight = weightSpinner.selectedItem.toString()
-        val height = heightSpinner.selectedItem.toString()
-        val about = aboutEditText.text.toString()
-
-        if (age == "Yaş" || weight == "Kilo" || height == "Boy" || about.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill out all fields", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val userInfo = mapOf(
-            "age" to age,
-            "weight" to weight,
-            "height" to height,
-            "about" to about
-        )
-
-        firestore.collection("users").document(currentUser!!.uid)
-            .set(userInfo)
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(requireContext(), "Failed to update profile: ${exception.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
 
     private fun saveUserData() {
         // EditText alanlarındaki metinleri al
@@ -415,25 +383,4 @@ class Profile : Fragment() {
         fun newInstance() = Profile()
     }
 
-    private class ImageLoaderTask(private val imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
-        override fun doInBackground(vararg params: String?): Bitmap? {
-            val url = params[0]
-            return try {
-                val connection: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
-                connection.doInput = true
-                connection.connect()
-                val input: InputStream = connection.inputStream
-                BitmapFactory.decodeStream(input)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-
-        override fun onPostExecute(result: Bitmap?) {
-            if (result != null) {
-                imageView.setImageBitmap(result)
-            }
-        }
-    }
 }

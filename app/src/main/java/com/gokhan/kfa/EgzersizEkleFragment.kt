@@ -49,13 +49,15 @@ class EgzersizEkleFragment : Fragment() {
 
     private fun init() {
         binding.rvEgzersizListesi.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(allExercises,
+        exerciseAdapter = EgzersizAdapter(
+            allExercises,
             onExerciseClicked = { exercise ->
 
             },
             onInfoClicked = { exercise ->
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
-            }
+            },
+            isRoutineExercise = false // Egzersiz ekleme menüsü için false
         )
         binding.rvEgzersizListesi.adapter = exerciseAdapter
 
@@ -65,6 +67,8 @@ class EgzersizEkleFragment : Fragment() {
             addSelectedExercisesToRoutine()
         }
     }
+
+
 
 
 
