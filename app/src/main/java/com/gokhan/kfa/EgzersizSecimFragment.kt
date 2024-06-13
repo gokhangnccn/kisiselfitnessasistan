@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gokhan.kfa.databinding.FragmentEgzersizSecimBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
@@ -22,9 +23,11 @@ class EgzersizSecimFragment : Fragment() {
     private var _binding: FragmentEgzersizSecimBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: FirebaseFirestore
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val selectedRoutineExercises = mutableListOf<Egzersiz>()
     private lateinit var exerciseAdapter: EgzersizAdapter
     private var routineId: String? = null
+    private var userId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +35,9 @@ class EgzersizSecimFragment : Fragment() {
     ): View {
         _binding = FragmentEgzersizSecimBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
+
+        // userId'yi belirleme (örneğin, kullanıcı giriş yaptıktan sonra belirlenmiş olabilir)
+        userId = auth.currentUser?.uid // Bu örnek bir ID'dir, gerçek uygulamada uygun şekilde ayarlayın
 
         return binding.root
     }
@@ -83,18 +89,15 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 
-
     private fun init() {
         binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
         exerciseAdapter = EgzersizAdapter(
             selectedRoutineExercises,
-            onExerciseClicked = { exercise ->
-                // Handle exercise click if needed
-            },
+            onExerciseClicked = { exercise -> /* Handle click */ },
             onInfoClicked = { exercise ->
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
             },
-            isRoutineExercise = true // Egzersiz seçim menüsü için true
+            isRoutineExercise = true // For exercise selection menu
         )
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
 
@@ -117,13 +120,14 @@ class EgzersizSecimFragment : Fragment() {
                 showEditRoutineDialog(id)
             }
         }
+
         routineId?.let { id ->
-            db.collection("routines").document(id).get()
+            db.collection("users").document(userId!!).collection("routines").document(id).get()
                 .addOnSuccessListener { document ->
                     if (document.exists()) {
                         val routine = document.toObject(Routine::class.java)
                         routine?.let {
-                            // Rutin adını ve açıklamasını güncelle
+                            // Update routine name and description
                             binding.tvRoutineName.text = it.name
                             binding.tvRoutineDescription.text = it.description
                         }
@@ -134,9 +138,8 @@ class EgzersizSecimFragment : Fragment() {
                 }
         }
 
-        fetchRoutineExercisesFromFirestore()
+        fetchRoutineExercisesFromFirestore() // Ensure this is called after setting up the adapter
     }
-
 
     private fun showEditRoutineDialog(routineId: String) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_edit_routine, null)
@@ -144,7 +147,7 @@ class EgzersizSecimFragment : Fragment() {
         val etRoutineDescription = dialogView.findViewById<EditText>(R.id.et_routine_description)
 
         // Pre-fill the dialog with current routine details
-        db.collection("routines").document(routineId).get()
+        db.collection("users").document(userId!!).collection("routines").document(routineId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val routine = document.toObject(Routine::class.java)
@@ -173,16 +176,14 @@ class EgzersizSecimFragment : Fragment() {
                     Toast.makeText(context, "Lütfen tüm alanları doldurun", Toast.LENGTH_SHORT).show()
                 }
             }
-
             .setNegativeButton("İptal", null)
             .create()
 
         dialog.show()
     }
 
-
     private fun updateRoutineDetails(routineId: String, newName: String, newDescription: String) {
-        val routineRef = db.collection("routines").document(routineId)
+        val routineRef = db.collection("users").document(userId!!).collection("routines").document(routineId)
         val updates = mapOf(
             "name" to newName,
             "description" to newDescription
@@ -198,39 +199,51 @@ class EgzersizSecimFragment : Fragment() {
                 Toast.makeText(context, "Rutin güncellenirken bir hata oluştu", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun fetchUpdatedRoutineDetails(routineId: String) {
-        db.collection("routines").document(routineId).get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val routine = document.toObject(Routine::class.java)
-                    routine?.let {
-                        // Rutin adını ve açıklamasını güncelle
-                        binding.tvRoutineName.text = it.name
-                        binding.tvRoutineDescription.text = it.description
+        userId?.let { userId ->
+            db.collection("users").document(userId)
+                .collection("routines").document(routineId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val routine = document.toObject(Routine::class.java)
+                        routine?.let {
+                            // Rutin adını ve açıklamasını güncelle
+                            binding.tvRoutineName.text = it.name
+                            binding.tvRoutineDescription.text = it.description
+                        }
                     }
-                }
-            }
-            .addOnFailureListener { e ->
-                Log.e("EgzersizSecimFragment", "Error fetching updated routine details", e)
-            }
-    }
-    private fun fetchRoutineExercisesFromFirestore() {
-        routineId?.let { routineId ->
-            db.collection("routines").document(routineId).collection("exercises").get()
-                .addOnSuccessListener { result ->
-                    val routineExercises = mutableListOf<Egzersiz>()
-                    for (document in result) {
-                        val exercise = document.toObject(Egzersiz::class.java)
-                        exercise.id = document.id
-                        routineExercises.add(exercise)
-                    }
-                    selectedRoutineExercises.clear()
-                    selectedRoutineExercises.addAll(routineExercises)
-                    exerciseAdapter.notifyDataSetChanged()
                 }
                 .addOnFailureListener { e ->
-                    Log.w("EgzersizSecimFragment", "Error fetching routine exercises", e)
+                    Log.e("EgzersizSecimFragment", "Error fetching updated routine details", e)
                 }
+        }
+    }
+
+    private fun fetchRoutineExercisesFromFirestore() {
+        Log.d("EgzersizSecimFragment", "Fetching routine exercises")
+        userId?.let { userId ->
+            routineId?.let { routineId ->
+                db.collection("users").document(userId)
+                    .collection("routines").document(routineId)
+                    .collection("exercises").get()
+                    .addOnSuccessListener { result ->
+                        val routineExercises = mutableListOf<Egzersiz>()
+                        for (document in result) {
+                            val exercise = document.toObject(Egzersiz::class.java)
+                            exercise.id = document.id
+                            routineExercises.add(exercise)
+                            Log.d("EgzersizSecimFragment", "Fetched exercise: ${exercise.name} with ID: ${exercise.id}")
+                        }
+                        selectedRoutineExercises.clear()
+                        selectedRoutineExercises.addAll(routineExercises)
+                        exerciseAdapter.notifyDataSetChanged()
+                        Log.d("EgzersizSecimFragment", "RecyclerView updated with ${routineExercises.size} exercises")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("EgzersizSecimFragment", "Error fetching routine exercises", e)
+                    }
+            }
         }
     }
 
@@ -241,11 +254,12 @@ class EgzersizSecimFragment : Fragment() {
             return
         }
 
-        // Rutine Id'sini kontrol et
+        // Rutin Id'sini kontrol et
         routineId?.let { routineId ->
             val batch = db.batch()
             for (exercise in selectedExercises) {
-                val exerciseRef = db.collection("routines").document(routineId)
+                val exerciseRef = db.collection("users").document(userId!!)
+                    .collection("routines").document(routineId)
                     .collection("exercises").document(exercise.id)
                 batch.delete(exerciseRef)
             }
@@ -274,3 +288,4 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 }
+

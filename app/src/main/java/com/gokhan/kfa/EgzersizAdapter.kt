@@ -4,6 +4,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,7 @@ class EgzersizAdapter(
     private val exercises: MutableList<Egzersiz>,
     private val onExerciseClicked: (Egzersiz) -> Unit,
     private val onInfoClicked: (Egzersiz) -> Unit,
-    private val isRoutineExercise: Boolean // Yeni parametre
+    private val isRoutineExercise: Boolean
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
     private val selectedExercises = mutableSetOf<Egzersiz>()
@@ -46,12 +47,16 @@ class EgzersizAdapter(
         holder.itemView.setOnClickListener {
             onExerciseClicked(exercise)
         }
+
+        holder.checkBox.setOnCheckedChangeListener(null)
+        holder.checkBox.isChecked = selectedExercises.contains(exercise)
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 selectedExercises.add(exercise)
             } else {
                 selectedExercises.remove(exercise)
             }
+            Log.d("EgzersizAdapter", "Selected exercises: ${selectedExercises.size}")
         }
     }
 
@@ -65,10 +70,11 @@ class EgzersizAdapter(
         exercises.clear()
         exercises.addAll(newExercises)
         notifyDataSetChanged()
+        Log.d("EgzersizAdapter", "Adapter updated with ${exercises.size} exercises")
     }
 
     class EgzersizViewHolder(
-        private val binding: ViewBinding, // Generic ViewBinding
+        private val binding: ViewBinding,
         private val onInfoClicked: (Egzersiz) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         val checkBox: CheckBox = if (binding is ItemEgzersizSecimBinding) binding.cbSelectExercise else (binding as ItemRutinEgzersiziBinding).cbSetCompleted
