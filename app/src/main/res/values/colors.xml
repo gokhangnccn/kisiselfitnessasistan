@@ -3,15 +3,20 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="c1">#222831</color>
-    <color name="c2">#393E46</color>
-    <color name="c3">#FF6969</color>
-    <color name="c4">#EEEEEE</color>
+    <color name="c1">#171717</color>
+    <color name="c2">#444444</color>
+    <color name="c3">#DA0037</color>
+    <color name="c4">#EDEDED</color>
 
-    <color name="y1">#5A4348</color>
+    <color name="ac1">#33171717</color>
+    <color name="ac2">#33444444</color>
+    <color name="ac3">#33DA0037</color>
+    <color name="ac4">#33EDEDED</color>
+
+    <color name="y1">#33444444</color>
     <color name="y2">#686D76</color>
-    <color name="y3">#5A4348</color>
-    <color name="y4">#5A4348</color>
+    <color name="y3">#686D76</color>
+    <color name="y4">#686D76</color>
 
 
 </resources>
