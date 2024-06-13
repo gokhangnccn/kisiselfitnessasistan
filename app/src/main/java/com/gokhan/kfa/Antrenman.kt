@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gokhan.kfa.databinding.FragmentAntrenmanBinding
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class Antrenman : Fragment() {
@@ -22,9 +23,8 @@ class Antrenman : Fragment() {
     private lateinit var db: FirebaseFirestore
     private val routines = mutableListOf<Routine>()
     private lateinit var routineAdapter: RoutineAdapter
-    private lateinit var exerciseAdapter: EgzersizAdapter
-    private var selectedRoutine: Routine? = null
-    private val exercises = mutableListOf<Egzersiz>()
+    private var userId: String? = null
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +32,8 @@ class Antrenman : Fragment() {
     ): View {
         _binding = FragmentAntrenmanBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+        userId = auth.currentUser?.uid
         return binding.root
     }
 
@@ -84,36 +86,44 @@ class Antrenman : Fragment() {
     }
 
     private fun createRoutine(routineName: String, routineDescription: String) {
-        val routine = hashMapOf(
-            "name" to routineName,
-            "description" to routineDescription,
-            "exercises" to emptyList<Egzersiz>()
-        )
+        val routine = Routine(name = routineName, description = routineDescription)
 
-        db.collection("routines").add(routine)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Rutin başarıyla oluşturuldu", Toast.LENGTH_SHORT).show()
-                fetchRoutinesFromFirestore()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Rutin oluşturulurken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        userId?.let { userId ->
+            db.collection("users").document(userId)
+                .collection("routines").add(routine)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Rutin başarıyla oluşturuldu", Toast.LENGTH_SHORT)
+                        .show()
+                    fetchRoutinesFromFirestore()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        context,
+                        "Rutin oluşturulurken hata oluştu: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e("Antrenman", "Error creating routine", e)
+                }
+        }
     }
 
     private fun fetchRoutinesFromFirestore() {
-        db.collection("routines").get()
-            .addOnSuccessListener { result ->
-                routines.clear()
-                for (document in result) {
-                    val routine = document.toObject(Routine::class.java)
-                    routine.id = document.id
-                    routines.add(routine)
+        userId?.let { userId ->
+            db.collection("users").document(userId)
+                .collection("routines").get()
+                .addOnSuccessListener { result ->
+                    routines.clear()
+                    for (document in result) {
+                        val routine = document.toObject(Routine::class.java)
+                        routine.id = document.id
+                        routines.add(routine)
+                    }
+                    routineAdapter.notifyDataSetChanged()
                 }
-                routineAdapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener { e ->
-                Log.w("Antrenman", "Error fetching routines", e)
-            }
+                .addOnFailureListener { e ->
+                    Log.w("Antrenman", "Error fetching routines", e)
+                }
+        }
     }
 
     private fun deleteSelectedRoutines() {
@@ -125,8 +135,10 @@ class Antrenman : Fragment() {
 
         val batch = db.batch()
         selectedRoutines.forEach { routine ->
-            val routineRef = db.collection("routines").document(routine.id)
-            batch.delete(routineRef)        }
+            val routineRef = db.collection("users").document(userId!!)
+                .collection("routines").document(routine.id)
+            batch.delete(routineRef)
+        }
 
         batch.commit()
             .addOnSuccessListener {
@@ -135,6 +147,7 @@ class Antrenman : Fragment() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Rutinler silinirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("Antrenman", "Error deleting routines", e)
             }
     }
 
