@@ -29,6 +29,7 @@ class EgzersizAdapter(
     private val onExerciseClicked: (Egzersiz) -> Unit,
     private val onInfoClicked: (Egzersiz) -> Unit,
     private val onDeleteClicked: (Egzersiz) -> Unit,
+
     private val isRoutineExercise: Boolean
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
