@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -27,6 +28,7 @@ class EgzersizAdapter(
     private val exercises: MutableList<Egzersiz>,
     private val onExerciseClicked: (Egzersiz) -> Unit,
     private val onInfoClicked: (Egzersiz) -> Unit,
+    private val onDeleteClicked: (Egzersiz) -> Unit,
     private val isRoutineExercise: Boolean
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
@@ -44,6 +46,13 @@ class EgzersizAdapter(
     override fun onBindViewHolder(holder: EgzersizViewHolder, position: Int) {
         val exercise = exercises[position]
         holder.bind(exercise)
+
+        holder.removeButton?.setOnClickListener {
+            onDeleteClicked(exercise)
+            notifyDataSetChanged()
+            Log.d("EgzersizAdapter", "Exercise removed from routine: ${exercise.name}")
+        }
+
         holder.itemView.setOnClickListener {
             onExerciseClicked(exercise)
         }
@@ -58,6 +67,8 @@ class EgzersizAdapter(
             }
             Log.d("EgzersizAdapter", "Selected exercises: ${selectedExercises.size}")
         }
+
+
     }
 
     override fun getItemCount() = exercises.size
@@ -76,8 +87,14 @@ class EgzersizAdapter(
     class EgzersizViewHolder(
         private val binding: ViewBinding,
         private val onInfoClicked: (Egzersiz) -> Unit
+
     ) : RecyclerView.ViewHolder(binding.root) {
         val checkBox: CheckBox = if (binding is ItemEgzersizSecimBinding) binding.cbSelectExercise else (binding as ItemRutinEgzersiziBinding).cbSetCompleted
+        val removeButton: ImageButton? = when (binding) {
+            is ItemRutinEgzersiziBinding -> binding.btnRemoveExerciseFromRoutine
+            else -> null
+        }
+
 
         fun bind(exercise: Egzersiz) {
             when (binding) {

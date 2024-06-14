@@ -54,7 +54,9 @@ class EgzersizSecimFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val totalItemCount = recyclerView.layoutManager?.itemCount ?: 0
-                val lastVisibleItemPosition = (recyclerView.layoutManager as? LinearLayoutManager)?.findLastVisibleItemPosition() ?: 0
+                val lastVisibleItemPosition =
+                    (recyclerView.layoutManager as? LinearLayoutManager)?.findLastVisibleItemPosition()
+                        ?: 0
 
                 if (lastVisibleItemPosition == totalItemCount - 1) {
                     fadeOutView(scrollDownIcon)
@@ -97,6 +99,7 @@ class EgzersizSecimFragment : Fragment() {
             onInfoClicked = { exercise ->
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
             },
+            onDeleteClicked = { exercise -> deleteExercise(exercise) }, // Added delete action
             isRoutineExercise = true // For exercise selection menu
         )
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
@@ -110,9 +113,6 @@ class EgzersizSecimFragment : Fragment() {
             }
         }
 
-        binding.btnRutineEgzersizSil.setOnClickListener {
-            deleteSelectedExerciseFromList()
-        }
 
         // Find the edit button and set its OnClickListener
         binding.btnEditRoutine.setOnClickListener {
@@ -238,7 +238,7 @@ class EgzersizSecimFragment : Fragment() {
                         selectedRoutineExercises.clear()
                         selectedRoutineExercises.addAll(routineExercises)
                         exerciseAdapter.notifyDataSetChanged()
-                        Log.d("EgzersizSecimFragment", "RecyclerView updated with ${routineExercises.size} exercises")
+                        Log.d("EgzersizSecimFragment", "RecyclerView updated with ${selectedRoutineExercises.size} exercises")
                     }
                     .addOnFailureListener { e ->
                         Log.e("EgzersizSecimFragment", "Error fetching routine exercises", e)
@@ -246,46 +246,50 @@ class EgzersizSecimFragment : Fragment() {
             }
         }
     }
+    private fun deleteExercise(exercise: Egzersiz) {
+        // Implement your delete logic here
+        // For example, show confirmation dialog or directly delete from Firestore
+        // Make sure to update UI after deletion
 
-    private fun deleteSelectedExerciseFromList() {
-        val selectedExercises = exerciseAdapter.getSelectedExercises()
-        if (selectedExercises.isEmpty()) {
-            Toast.makeText(context, "Lütfen silmek için egzersiz seçin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Rutin Id'sini kontrol et
-        routineId?.let { routineId ->
-            val batch = db.batch()
-            for (exercise in selectedExercises) {
-                val exerciseRef = db.collection("users").document(userId!!)
-                    .collection("routines").document(routineId)
-                    .collection("exercises").document(exercise.id)
-                batch.delete(exerciseRef)
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Egzersizi Sil")
+        builder.setMessage("Bu egzersizi rutinden silmek istediğinizden emin misiniz?")
+        builder.setPositiveButton("Evet") { _, _ ->
+            userId?.let { userId ->
+                routineId?.let { routineId ->
+                    val exerciseRef = db.collection("users").document(userId)
+                        .collection("routines").document(routineId)
+                        .collection("exercises").document(exercise.id!!)
+                    exerciseRef.delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Egzersiz başarıyla silindi", Toast.LENGTH_SHORT).show()
+                            selectedRoutineExercises.remove(exercise)
+                            exerciseAdapter.notifyDataSetChanged()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("EgzersizSecimFragment", "Error deleting exercise", e)
+                            Toast.makeText(context, "Egzersiz silinirken bir hata oluştu", Toast.LENGTH_SHORT).show()
+                        }
+                }
             }
-            batch.commit()
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Seçilen egzersizler başarıyla silindi", Toast.LENGTH_SHORT).show()
-                    fetchRoutineExercisesFromFirestore()
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, "Seçilen egzersizler silinirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
         }
+        builder.setNegativeButton("İptal", null)
+        builder.show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
     companion object {
         @JvmStatic
-        fun newInstance(routineId: String) = EgzersizSecimFragment().apply {
-            arguments = Bundle().apply {
+        fun newInstance(routineId: String): EgzersizSecimFragment {
+            val fragment = EgzersizSecimFragment()
+            val args = Bundle().apply {
                 putString("routineId", routineId)
             }
+            fragment.arguments = args
+            return fragment
         }
     }
 }
-
