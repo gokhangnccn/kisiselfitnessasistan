@@ -60,6 +60,7 @@ class EgzersizEkleFragment : Fragment() {
             onInfoClicked = { exercise ->
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
             },
+            onDeleteClicked = {  },
             isRoutineExercise = false // Egzersiz ekleme menüsü için false
         )
         binding.rvEgzersizListesi.adapter = exerciseAdapter

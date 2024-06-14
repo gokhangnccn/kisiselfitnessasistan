@@ -90,13 +90,6 @@
             android:backgroundTint="@color/c1"
             android:textColor="@color/c4" />
 
-        <Button
-            android:id="@+id/btn_rutine_egzersiz_sil"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Egzersizi Sil"
-            android:backgroundTint="@color/c1"
-            android:textColor="@color/c4" />
 
     </LinearLayout>
 
