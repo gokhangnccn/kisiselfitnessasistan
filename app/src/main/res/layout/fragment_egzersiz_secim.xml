@@ -37,6 +37,16 @@
                 android:textColor="@color/white"
                 android:text="Rutin Açıklaması"
                 android:textSize="15sp" />
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:format="Geçen Süre: %s"
+                android:textSize="15sp"
+                android:textColor="@color/c4"/>
         </LinearLayout>
 
         <ImageButton
@@ -49,8 +59,6 @@
             android:padding="8dp"
             android:scaleType="fitCenter"
             app:tint="@color/c4" />
-
-
     </LinearLayout>
 
     <!-- Egzersiz Seçim -->
@@ -89,23 +97,33 @@
             android:layout_marginEnd="8dp"
             android:backgroundTint="@color/c1"
             android:textColor="@color/c4" />
-
+        <Button
+            android:id="@+id/btn_pause_routine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Durdur"
+            android:textStyle="bold"
+            android:backgroundTint="@color/c1"
+            android:textColor="@color/c4" />
+        <Button
+            android:id="@+id/btn_finish_routine"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Egzersizi Bitir"
+            android:backgroundTint="@color/c1"
+            android:textColor="@color/c4" />
 
     </LinearLayout>
 
     <!-- Aşağı Ok İkonu -->
     <ImageView
-    android:id="@+id/scroll_down_icon"
-    android:layout_width="36dp"
-    android:layout_height="36dp"
-    android:src="@drawable/arrow_down"
-    android:layout_above="@+id/bottom_buttons_layout"
-    android:layout_centerInParent="true"
-    android:layout_marginBottom="18dp"
-    app:tint="@color/c4" />
-
-
-
-
+        android:id="@+id/scroll_down_icon"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/arrow_down"
+        android:layout_above="@id/bottom_buttons_layout"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="18dp"
+        app:tint="@color/c4" />
 
 </RelativeLayout>
