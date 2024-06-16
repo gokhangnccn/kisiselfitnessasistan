@@ -126,4 +126,10 @@
         android:layout_marginBottom="18dp"
         app:tint="@color/c4" />
 
+    <include
+        android:id="@+id/overlay_layout"
+        layout="@layout/overlay_current_routine"
+        android:visibility="gone"/>
+
+
 </RelativeLayout>

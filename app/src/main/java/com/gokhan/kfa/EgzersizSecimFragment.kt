@@ -41,6 +41,8 @@ class EgzersizSecimFragment : Fragment() {
     private var isChronometerRunning = false
     private var chronometerBaseTime: Long = 0L
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -168,7 +170,6 @@ class EgzersizSecimFragment : Fragment() {
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
             },
             onDeleteClicked = { exercise -> deleteExercise(exercise) }, // Added delete action
-
             isRoutineExercise = true // For exercise selection menu
         )
         binding.rvAktifEgzersizler.adapter = exerciseAdapter
@@ -403,7 +404,6 @@ class EgzersizSecimFragment : Fragment() {
                             binding.tvRoutineName.text = it.name
                             binding.tvRoutineDescription.text = it.description
                         }
-
                     }
                 }
                 .addOnFailureListener { e ->
@@ -435,57 +435,6 @@ class EgzersizSecimFragment : Fragment() {
                     .addOnFailureListener { e ->
                         Log.e("EgzersizSecimFragment", "Error fetching routine exercises", e)
                     }
-=======
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("EgzersizSecimFragment", "Error fetching updated routine details", e)
-                }
-        }
-    }
-
-    private fun fetchRoutineExercisesFromFirestore() {
-        Log.d("EgzersizSecimFragment", "Fetching routine exercises")
-        userId?.let { userId ->
-            routineId?.let { routineId ->
-                db.collection("users").document(userId)
-                    .collection("routines").document(routineId)
-                    .collection("exercises").get()
-                    .addOnSuccessListener { result ->
-                        val routineExercises = mutableListOf<Egzersiz>()
-                        for (document in result) {
-                            val exercise = document.toObject(Egzersiz::class.java)
-                            exercise.id = document.id
-                            routineExercises.add(exercise)
-                            Log.d("EgzersizSecimFragment", "Fetched exercise: ${exercise.name} with ID: ${exercise.id}")
-                        }
-                        selectedRoutineExercises.clear()
-                        selectedRoutineExercises.addAll(routineExercises)
-                        exerciseAdapter.notifyDataSetChanged()
-                        Log.d("EgzersizSecimFragment", "RecyclerView updated with ${routineExercises.size} exercises")
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("EgzersizSecimFragment", "Error fetching routine exercises", e)
-                    }
-            }
-        }
-    }
-
-    private fun deleteSelectedExerciseFromList() {
-        val selectedExercises = exerciseAdapter.getSelectedExercises()
-        if (selectedExercises.isEmpty()) {
-            Toast.makeText(context, "Lütfen silmek için egzersiz seçin", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // Rutin Id'sini kontrol et
-        routineId?.let { routineId ->
-            val batch = db.batch()
-            for (exercise in selectedExercises) {
-                val exerciseRef = db.collection("users").document(userId!!)
-                    .collection("routines").document(routineId)
-                    .collection("exercises").document(exercise.id)
-                batch.delete(exerciseRef)
             }
         }
     }
@@ -538,4 +487,3 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 }
-

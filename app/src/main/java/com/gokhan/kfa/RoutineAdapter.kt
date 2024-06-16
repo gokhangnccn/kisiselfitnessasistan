@@ -42,6 +42,7 @@ class RoutineAdapter(
         }
         holder.startRoutineButton.setOnClickListener {
             onStartRoutineClicked(currentRoutine)
+
         }
     }
 
