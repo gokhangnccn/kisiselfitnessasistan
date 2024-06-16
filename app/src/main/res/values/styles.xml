@@ -4,5 +4,34 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/c3</item>
     </style>
+    <style name="CustomAlertDialogTheme.Dark" parent="Theme.AppCompat.Dialog.Alert">
+        <!-- Title text color -->
+        <item name="android:textColorPrimary">@color/x1</item>
+        <!-- Message text color -->
+        <item name="android:textColor">@color/x1</item>
+        <!-- Button text color -->
+        <item name="colorAccent">@color/x3</item>
+        <!-- Background color -->
+        <item name="android:background">@color/x2</item>
+        <!-- Background color for AppCompatDialog -->
+        <item name="android:windowBackground">@color/x2</item>
+    </style>
+
+
+    <!-- styles.xml -->
+    <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/x4</item>
+        <item name="android:textColorHint">@color/x4</item>
+        <item name="hintTextColor">@color/x1</item>
+    </style>
+
+    <style name="CustomTextInputEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/x4</item>
+        <item name="android:textColorHint">@color/x3</item>
+        <item name="android:backgroundTint">@color/x2</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+
 
 </resources>

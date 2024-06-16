@@ -41,4 +41,10 @@
         android:textColor="@color/c3"
         android:layout_marginTop="8dp"/>
 
+    <include
+        android:id="@+id/overlay_layout"
+        layout="@layout/overlay_current_routine"
+        android:visibility="gone"/>
+
+
 </LinearLayout>

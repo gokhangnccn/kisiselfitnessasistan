@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/c1">
+
+    <TextView
+        android:id="@+id/dialogBaslik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rutini Tamamla"
+        android:textSize="20sp"
+        android:textColor="@color/c4"
+        android:fontFamily="@font/roboto_bold"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:id="@+id/dialogMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rutin kaydedilsin mi? Not ekleyebilirsiniz."
+        android:textSize="16sp"
+        android:textColor="@color/c2"
+        android:fontFamily="@font/roboto_regular"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Not Ekleyin"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textInputEditTextNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/c4"
+            android:textColorHint="@color/c2"
+            android:padding="16dp"
+            android:backgroundTint="@color/c2"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/ratingPrompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Antrenmanınızı değerlendirin:"
+        android:textSize="16sp"
+        android:textColor="@color/c2"
+        android:fontFamily="@font/roboto_regular"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:rating="0"
+        android:layout_marginBottom="16dp"
+        android:progressTint="@color/c3"
+        android:secondaryProgressTint="@color/c2"
+        android:backgroundTint="@color/c1"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="İptal"
+            android:textColor="@color/c3"
+            android:background="@drawable/button_background"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/confirmButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tamamla"
+            android:textColor="@color/c3"
+            android:background="@drawable/button_background"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+</LinearLayout>

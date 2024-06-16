@@ -27,4 +27,8 @@
         app:menu="@menu/bottom_nav"
         app:labelVisibilityMode="labeled"
         app:itemHorizontalTranslationEnabled="false" />
+    <include
+        android:id="@+id/overlay_layout"
+        layout="@layout/overlay_current_routine"
+        android:visibility="gone"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
