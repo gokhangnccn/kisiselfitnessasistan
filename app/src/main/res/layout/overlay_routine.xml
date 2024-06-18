@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    android:visibility="gone"
+    android:id="@+id/overlay_layout">
+
+    <TextView
+        android:id="@+id/tv_ongoing_routine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@android:color/black"
+        android:textColor="@android:color/white"
+        android:text="Şu anda devam eden bir antrenmanın var"
+        android:padding="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_elapsed_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_ongoing_routine"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:text="Geçen Süre: 00:00:00"
+        android:padding="16dp"/>
+
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_elapsed_time"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Devam Et"/>
+
+    <Button
+        android:id="@+id/btn_finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_continue"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"
+        android:text="Bitir"/>
+
+</RelativeLayout>

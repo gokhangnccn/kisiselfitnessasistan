@@ -27,8 +27,90 @@
         app:menu="@menu/bottom_nav"
         app:labelVisibilityMode="labeled"
         app:itemHorizontalTranslationEnabled="false" />
-    <include
+
+    <RelativeLayout
         android:id="@+id/overlay_layout"
-        layout="@layout/overlay_current_routine"
-        android:visibility="gone"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/c1"
+        android:visibility="gone"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.9">
+
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/c3"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_light"
+            android:text="Şu an devam eden bir antrenmanınız var!"
+            android:padding="8dp" />
+
+        <TextView
+            android:id="@+id/tv_elapsed_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_info"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/c4"
+            android:textSize="16sp"
+            android:fontFamily="@font/roboto_thin"
+            android:text="Geçen Süre: 00:00:00"
+            android:padding="4dp" />
+
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_elapsed_time"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="8dp"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_below="@id/chronometer"
+            android:layout_marginTop="4dp">
+
+            <Button
+                android:id="@+id/btn_continue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Devam Et"
+                android:textColor="@android:color/holo_green_dark"
+                android:fontFamily="@font/roboto_regular"
+                android:backgroundTint="@android:color/transparent"
+                android:elevation="4dp"
+                android:padding="12dp"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Bitir"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@android:color/holo_red_dark"
+                android:backgroundTint="@android:color/transparent"
+                android:elevation="4dp"
+                android:padding="12dp"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

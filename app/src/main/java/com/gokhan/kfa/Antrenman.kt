@@ -1,6 +1,7 @@
 package com.gokhan.kfa
 
 import RoutineAdapter
+import RoutineViewModel
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gokhan.kfa.databinding.FragmentAntrenmanBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +28,9 @@ class Antrenman : Fragment() {
     private var userId: String? = null
     private lateinit var auth: FirebaseAuth
 
+    private val routineViewModel: RoutineViewModel by activityViewModels()
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,13 +39,17 @@ class Antrenman : Fragment() {
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser?.uid
+
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+
     }
+
 
     private fun init() {
         binding.rvRoutines.layoutManager = LinearLayoutManager(context)
@@ -59,11 +68,14 @@ class Antrenman : Fragment() {
     }
 
     private fun onStartRoutineClicked(routine: Routine) {
+        routineViewModel.startRoutine(routine.id)
+        // Directly navigating to the exercise selection fragment
         fragmentManager?.beginTransaction()
             ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id))
             ?.addToBackStack(null)
             ?.commit()
     }
+
 
     private fun showCreateRoutineDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_create_routine, null)
