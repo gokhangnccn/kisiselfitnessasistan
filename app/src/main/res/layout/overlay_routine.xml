@@ -1,46 +1,73 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#80000000"
     android:visibility="gone"
     android:id="@+id/overlay_layout">
 
-    <TextView
-        android:id="@+id/tv_ongoing_routine"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@android:color/black"
-        android:textColor="@android:color/white"
-        android:text="Şu anda devam eden bir antrenmanın var"
-        android:padding="16dp"/>
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:padding="24dp"
+        app:cardBackgroundColor="@color/white">
 
-    <TextView
-        android:id="@+id/tv_elapsed_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_ongoing_routine"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"
-        android:text="Geçen Süre: 00:00:00"
-        android:padding="16dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
 
-    <Button
-        android:id="@+id/btn_continue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_elapsed_time"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"
-        android:text="Devam Et"/>
+            <TextView
+                android:id="@+id/tv_ongoing_routine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:text="Şu anda devam eden bir antrenmanın var"
+                android:padding="16dp"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_bold"/>
 
-    <Button
-        android:id="@+id/btn_finish"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_continue"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"
-        android:text="Bitir"/>
+            <TextView
+                android:id="@+id/tv_elapsed_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@android:color/black"
+                android:text="Geçen Süre: 00:00:00"
+                android:padding="16dp"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_regular"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_continue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Devam Et"
+                app:cornerRadius="16dp"
+                app:strokeColor="@android:color/holo_blue_dark"
+                app:strokeWidth="2dp"
+                app:backgroundTint="@android:color/holo_blue_light"
+                app:rippleColor="@android:color/holo_blue_dark"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_finish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Bitir"
+                app:cornerRadius="16dp"
+                app:strokeColor="@android:color/holo_red_dark"
+                app:strokeWidth="2dp"
+                app:backgroundTint="@android:color/holo_red_light"
+                app:rippleColor="@android:color/holo_red_dark"/>
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </RelativeLayout>

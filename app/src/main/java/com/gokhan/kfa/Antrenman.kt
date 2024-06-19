@@ -31,6 +31,7 @@ class Antrenman : Fragment() {
     private val routineViewModel: RoutineViewModel by activityViewModels()
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,13 +69,61 @@ class Antrenman : Fragment() {
     }
 
     private fun onStartRoutineClicked(routine: Routine) {
-        routineViewModel.startRoutine(routine.id)
-        // Directly navigating to the exercise selection fragment
-        fragmentManager?.beginTransaction()
-            ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id))
-            ?.addToBackStack(null)
-            ?.commit()
+        if (routineViewModel.isRoutineActive()) {
+            showRoutineActiveWarning(routine)
+        } else {
+            routineViewModel.startRoutine(routine.id)
+            val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
+            fragmentManager?.beginTransaction()
+                ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id, elapsedTime))
+                ?.addToBackStack(null)
+                ?.commit()
+        }
     }
+
+    private fun showRoutineActiveWarning(routine: Routine) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_warning, null)
+
+        // Dialog oluştur
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        // Dialog içindeki bileşenlere erişim sağla
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_iptal)
+        val btnOk = dialogView.findViewById<Button>(R.id.btn_tamam)
+
+        // İptal butonuna tıklama olayı ekle
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Tamam butonuna tıklama olayı ekle
+        btnOk.setOnClickListener {
+            if (routineViewModel.isRoutineActive()) {
+                val activeRoutineId = routineViewModel.currentRoutineId
+                if (activeRoutineId != null) {
+                    val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
+                    val fragment = EgzersizSecimFragment.newInstance(activeRoutineId, elapsedTime)
+                    fragmentManager?.beginTransaction()
+                        ?.replace(R.id.frame_layout, fragment)
+                        ?.addToBackStack(null)
+                        ?.commit()
+                } else {
+                    Toast.makeText(requireContext(), "Aktif bir rutin bulunamadı", Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+
+        // Dialogu göster
+        dialog.show()
+    }
+
+
+
+
+
 
 
     private fun showCreateRoutineDialog() {

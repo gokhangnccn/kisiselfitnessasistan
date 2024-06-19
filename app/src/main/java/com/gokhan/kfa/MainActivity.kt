@@ -3,17 +3,17 @@ package com.gokhan.kfa
 import RoutineViewModel
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Chronometer
-import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gokhan.kfa.databinding.ActivityMainBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var routineViewModel: RoutineViewModel
     private lateinit var chronometer: Chronometer
-    private lateinit var overlayLayout: RelativeLayout
+    private lateinit var overlayLayout: MaterialCardView
     private lateinit var elapsedTimeTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,17 +39,14 @@ class MainActivity : AppCompatActivity() {
                     replaceFragment(Menu.newInstance())
                     true
                 }
-
                 R.id.profile -> {
                     replaceFragment(Profile.newInstance())
                     true
                 }
-
                 R.id.antrenman -> {
                     replaceFragment(Antrenman.newInstance())
                     true
                 }
-
                 else -> false
             }
         }
@@ -64,11 +61,10 @@ class MainActivity : AppCompatActivity() {
         chronometer = findViewById(R.id.chronometer)
 
         routineViewModel.isRoutineActive.observe(this) { isActive ->
+            updateOverlayVisibility()
             if (isActive) {
-                overlayLayout.visibility = View.VISIBLE
                 chronometer.start()
             } else {
-                overlayLayout.visibility = View.GONE
                 chronometer.stop()
             }
         }
@@ -86,7 +82,9 @@ class MainActivity : AppCompatActivity() {
             finishRoutine()
         }
 
-
+        supportFragmentManager.addOnBackStackChangedListener {
+            updateOverlayVisibility()
+        }
     }
 
     private fun formatElapsedTime(elapsedTime: Long): String {
@@ -100,7 +98,16 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.frame_layout, fragment)
+        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+    }
+
+    private fun updateOverlayVisibility() {
+        if (routineViewModel.isRoutineActive.value == true && getCurrentFragment().let { it !is EgzersizSecimFragment && it !is EgzersizEkleFragment }) {
+            overlayLayout.visibility = View.VISIBLE
+        } else {
+            overlayLayout.visibility = View.GONE
+        }
     }
 
     // Continue Routine
@@ -121,16 +128,29 @@ class MainActivity : AppCompatActivity() {
 
     // Navigate to EgzersizSecimFragment
     private fun navigateToEgzersizSecimFragment(routineId: String?) {
-        val fragment = EgzersizSecimFragment.newInstance(routineId)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.frame_layout, fragment)
-            .addToBackStack(null)
-            .commit()
+        routineId?.let {
+            val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
+            val fragment = EgzersizSecimFragment.newInstance(it, elapsedTime)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.frame_layout, fragment)
+                .addToBackStack(null)
+                .commit()
+        } ?: run {
+            // Handle the case where routineId is null, if necessary
+            Log.e("NavigationError", "Routine ID is null")
+        }
     }
+
+
+
 
     // Save Routine Details
     private fun saveRoutineDetails() {
         // Logic to save routine details to Firestore
     }
 
+    // Get current fragment
+    private fun getCurrentFragment(): Fragment? {
+        return supportFragmentManager.findFragmentById(R.id.frame_layout)
+    }
 }

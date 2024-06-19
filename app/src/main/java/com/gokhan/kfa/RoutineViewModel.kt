@@ -56,5 +56,9 @@ class RoutineViewModel : ViewModel() {
     fun triggerFinishRoutine() {
         _finishRoutineEvent.value = Unit
     }
+
+    fun isRoutineActive(): Boolean {
+        return _isRoutineActive.value == true
+    }
 }
 

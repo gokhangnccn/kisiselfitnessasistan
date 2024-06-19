@@ -34,6 +34,7 @@ class EgzersizSecimFragment : Fragment() {
     private lateinit var db: FirebaseFirestore
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+
     private val selectedRoutineExercises = mutableListOf<Egzersiz>()
     private lateinit var exerciseAdapter: EgzersizAdapter
 
@@ -45,9 +46,6 @@ class EgzersizSecimFragment : Fragment() {
     private var chronometerBaseTime: Long = 0L
 
     private val routineViewModel: RoutineViewModel by activityViewModels()
-
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,11 +60,13 @@ class EgzersizSecimFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         routineId = arguments?.getString("routineId")
+        val elapsedTime = arguments?.getLong("elapsedTime") ?: 0L
 
         val scrollDownIcon: ImageView = view.findViewById(R.id.scroll_down_icon)
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_aktif_egzersizler)
 
         chronometer = view.findViewById(R.id.chronometer)
+        chronometer.base = SystemClock.elapsedRealtime() - elapsedTime
 
         routineViewModel.finishRoutineEvent.observe(viewLifecycleOwner, Observer {
             finishRoutine()
@@ -221,6 +221,8 @@ class EgzersizSecimFragment : Fragment() {
 
         fetchRoutineExercisesFromFirestore() // Ensure this is called after setting up the adapter
     }
+
+
     private fun finishRoutine() {
         val userId = userId
         val routineId = routineId
@@ -487,16 +489,13 @@ class EgzersizSecimFragment : Fragment() {
         context?.stopService(intent)
     }
     companion object {
-        private const val ARG_ROUTINE_ID = "routineId"
-
-        fun newInstance(routineId: String?): EgzersizSecimFragment {
-            val fragment = EgzersizSecimFragment()
-            val args = Bundle()
-            args.putString(ARG_ROUTINE_ID, routineId)
-            fragment.arguments = args
-            return fragment
-        }
+        @JvmStatic
+        fun newInstance(routineId: String, elapsedTime: Long) =
+            EgzersizSecimFragment().apply {
+                arguments = Bundle().apply {
+                    putString("routineId", routineId)
+                    putLong("elapsedTime", elapsedTime)
+                }
+            }
     }
-
-
 }

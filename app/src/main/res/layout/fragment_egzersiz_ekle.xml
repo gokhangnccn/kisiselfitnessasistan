@@ -1,26 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/egzersiz_ekle"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/egzersiz_ekle">
+    android:layout_height="match_parent">
 
-    <!-- Egzersizlerin Listelendiği RecyclerView -->
+    <!-- Toolbar -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/c1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Rutine Egzersiz Ekleyin"
+            android:layout_marginStart="4dp"
+            android:textColor="@color/c4"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_egzersiz_listesi"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
         android:background="@color/c1"
         android:padding="16dp"/>
 
-    <!-- Seçimi Tamamla Butonu -->
-    <Button
+    <!-- Buton -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/btn_complete_selection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seçimi Tamamla"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="12dp"
-        android:backgroundTint="@color/y2"
-        android:textColor="@color/c1" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/c2"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:contentDescription="Complete Selection"
+                android:src="@drawable/baseline_check_circle"
+                app:tint="@android:color/holo_green_dark" />
+
+            <TextView
+                android:id="@+id/iv_info_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Bitir"
+                android:textColor="@color/c4"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </RelativeLayout>
