@@ -128,7 +128,7 @@
 
     <include
         android:id="@+id/overlay_layout"
-        layout="@layout/overlay_current_routine"
+        layout="@layout/overlay_routine"
         android:visibility="gone"/>
 
 

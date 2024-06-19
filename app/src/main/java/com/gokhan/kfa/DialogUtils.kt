@@ -3,51 +3,52 @@ package com.gokhan.kfa
 import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.gokhan.kfa.databinding.DialogEgzersizDetayBinding
 
 object DialogUtils {
-    fun showOverlayDialog(context: Context, onContinue: () -> Unit, onFinish: () -> Unit) {
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.overlay_dialog, null)
-        val continueButton = dialogView.findViewById<Button>(R.id.btn_continue)
-        val finishButton = dialogView.findViewById<Button>(R.id.btn_finish)
-
-        val builder = AlertDialog.Builder(context)
-        builder.setView(dialogView)
-            .setCancelable(false)
-
-        val dialog = builder.create()
-
-        continueButton.setOnClickListener {
-            onContinue()
-            dialog.dismiss()
-        }
-
-        finishButton.setOnClickListener {
-            onFinish()
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
     fun showExerciseDetailsDialog(context: Context, exercise: Egzersiz) {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_egzersiz_detay, null)
-        val exerciseName = dialogView.findViewById<TextView>(R.id.tv_exercise_name)
-        val exerciseDescription = dialogView.findViewById<TextView>(R.id.tv_exercise_description)
+        val dialogBinding = DialogEgzersizDetayBinding.bind(dialogView)
 
-        exerciseName.text = exercise.name
-        exerciseDescription.text = exercise.description
+        dialogBinding.tvExerciseName.text = exercise.name
+        dialogBinding.tvExerciseDescription.text = exercise.description
+        dialogBinding.tvTargetMuscles.text = "Hedef Kaslar: ${exercise.targetMuscleGroups?.joinToString(", ")}"
+        dialogBinding.tvSecondaryMuscles.text = "Yardımcı Kaslar: ${exercise.secondaryTargetMuscleGroups?.joinToString(", ")}"
+        dialogBinding.tvEquipment.text = "Ekipman: ${exercise.equipment}"
+        dialogBinding.tvHowTo.text = "Nasıl Yapılır: ${exercise.nasilYapilir}"
 
-        val builder = AlertDialog.Builder(context)
-        builder.setView(dialogView)
-            .setTitle("Egzersiz Detayları")
-            .setPositiveButton("Kapat") { dialog, _ ->
+        val width = 300
+        val height = 300
+
+        Glide.with(context)
+            .asGif()
+            .load(exercise.gifUrl)
+            .apply(
+                RequestOptions()
+                    .override(width, height)
+                    .fitCenter()
+                    .placeholder(R.drawable.gymicon)
+                    .error(R.drawable.baseline_image_not_supported_24)
+            )
+            .into(dialogBinding.ivExerciseGif)
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .setPositiveButton("Tamam") { dialog, _ ->
                 dialog.dismiss()
             }
+            .create()
 
-        val dialog = builder.create()
+        dialog.setOnShowListener {
+            val positiveButton = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setTextColor(ContextCompat.getColor(context, R.color.c4))
+        }
+
         dialog.show()
+
     }
 }
 

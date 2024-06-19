@@ -1,6 +1,7 @@
 package com.gokhan.kfa
 
 import RoutineAdapter
+import RoutineViewModel
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gokhan.kfa.databinding.FragmentAntrenmanBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +28,10 @@ class Antrenman : Fragment() {
     private var userId: String? = null
     private lateinit var auth: FirebaseAuth
 
+    private val routineViewModel: RoutineViewModel by activityViewModels()
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,13 +40,17 @@ class Antrenman : Fragment() {
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         userId = auth.currentUser?.uid
+
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+
     }
+
 
     private fun init() {
         binding.rvRoutines.layoutManager = LinearLayoutManager(context)
@@ -59,11 +69,62 @@ class Antrenman : Fragment() {
     }
 
     private fun onStartRoutineClicked(routine: Routine) {
-        fragmentManager?.beginTransaction()
-            ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id))
-            ?.addToBackStack(null)
-            ?.commit()
+        if (routineViewModel.isRoutineActive()) {
+            showRoutineActiveWarning(routine)
+        } else {
+            routineViewModel.startRoutine(routine.id)
+            val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
+            fragmentManager?.beginTransaction()
+                ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id, elapsedTime))
+                ?.addToBackStack(null)
+                ?.commit()
+        }
     }
+
+    private fun showRoutineActiveWarning(routine: Routine) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_warning, null)
+
+        // Dialog oluştur
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        // Dialog içindeki bileşenlere erişim sağla
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_iptal)
+        val btnOk = dialogView.findViewById<Button>(R.id.btn_tamam)
+
+        // İptal butonuna tıklama olayı ekle
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Tamam butonuna tıklama olayı ekle
+        btnOk.setOnClickListener {
+            if (routineViewModel.isRoutineActive()) {
+                val activeRoutineId = routineViewModel.currentRoutineId
+                if (activeRoutineId != null) {
+                    val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
+                    val fragment = EgzersizSecimFragment.newInstance(activeRoutineId, elapsedTime)
+                    fragmentManager?.beginTransaction()
+                        ?.replace(R.id.frame_layout, fragment)
+                        ?.addToBackStack(null)
+                        ?.commit()
+                } else {
+                    Toast.makeText(requireContext(), "Aktif bir rutin bulunamadı", Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+
+        // Dialogu göster
+        dialog.show()
+    }
+
+
+
+
+
+
 
     private fun showCreateRoutineDialog() {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_create_routine, null)
