@@ -89,8 +89,8 @@
 
     </LinearLayout>
 
-    <!-- Table for Sets, Repetitions, Weight, and Completion -->
     <TableLayout
+        android:id="@+id/tableLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="*"
@@ -218,7 +218,7 @@
             android:layout_gravity="center"
             android:background="@drawable/icon_set_ekle" />
 
-
+        <!-- Remove Exercise Button Bottom Right -->
         <ImageButton
             android:id="@+id/btn_remove_exercise_from_routine"
             android:layout_width="36dp"

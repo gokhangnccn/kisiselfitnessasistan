@@ -11,12 +11,14 @@ import com.google.firebase.auth.FirebaseAuth
 
 class Menu : Fragment() {
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
         val view = inflater.inflate(R.layout.fragment_menu, container, false)
+
 
         val buttonCikis: Button = view.findViewById(R.id.button_cikis)
         buttonCikis.setOnClickListener {

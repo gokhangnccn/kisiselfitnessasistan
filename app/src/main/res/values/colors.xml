@@ -13,17 +13,14 @@
     <color name="ac3">#33DA0037</color>
     <color name="ac4">#33EDEDED</color>
 
-    <color name="y1">#33444444</color>
-    <color name="y2">#686D76</color>
-    <color name="y3">#686D76</color>
-    <color name="y4">#686D76</color>
+    <color name="y1">#33171717</color>
+    <color name="y2">#66171717</color>
+    <color name="y3">#99171717</color>
 
     <color name="x1">#171717</color>
     <color name="x2">#444444</color>
     <color name="x3">#DA0037</color>
     <color name="x4">#EDEDED</color>
-
-
 
 
 </resources>

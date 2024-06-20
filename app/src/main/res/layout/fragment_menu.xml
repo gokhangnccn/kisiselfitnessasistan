@@ -81,12 +81,4 @@
         android:layout_gravity="center"
         android:layout_marginTop="24dp"/>
 
-    <include
-        android:id="@+id/overlay_layout"
-        layout="@layout/overlay_current_routine"
-        android:visibility="gone"/>
-    <include
-        android:id="@+id/overlay_layout"
-        layout="@layout/overlay_current_routine"
-        android:visibility="gone"/>
 </LinearLayout>

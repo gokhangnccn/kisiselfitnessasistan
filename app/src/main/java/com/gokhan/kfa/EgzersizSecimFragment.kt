@@ -1,21 +1,33 @@
 package com.gokhan.kfa
 
+import RoutineViewModel
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.Chronometer
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RatingBar
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gokhan.kfa.databinding.FragmentEgzersizSecimBinding
@@ -31,6 +43,7 @@ class EgzersizSecimFragment : Fragment() {
     private lateinit var db: FirebaseFirestore
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+
     private val selectedRoutineExercises = mutableListOf<Egzersiz>()
     private lateinit var exerciseAdapter: EgzersizAdapter
 
@@ -41,7 +54,7 @@ class EgzersizSecimFragment : Fragment() {
     private var isChronometerRunning = false
     private var chronometerBaseTime: Long = 0L
 
-
+    private val routineViewModel: RoutineViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,19 +63,33 @@ class EgzersizSecimFragment : Fragment() {
         _binding = FragmentEgzersizSecimBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
         userId = auth.currentUser?.uid
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         routineId = arguments?.getString("routineId")
+        val elapsedTime = arguments?.getLong("elapsedTime") ?: 0L
 
         val scrollDownIcon: ImageView = view.findViewById(R.id.scroll_down_icon)
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_aktif_egzersizler)
 
         chronometer = view.findViewById(R.id.chronometer)
-        startChronometer()
+        chronometer.base = SystemClock.elapsedRealtime() - elapsedTime
+
+        routineViewModel.finishRoutineEvent.observe(viewLifecycleOwner, Observer {
+            finishRoutine()
+        })
+
+        // If routine is active, resume the chronometer
+        routineViewModel.elapsedTime.observe(viewLifecycleOwner) { elapsedTime ->
+            if (routineViewModel.isRoutineActive.value == true) {
+                chronometer.base = SystemClock.elapsedRealtime() - elapsedTime
+                chronometer.start()
+            }
+        }
+
+
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -91,19 +118,65 @@ class EgzersizSecimFragment : Fragment() {
             toggleChronometer()
         }
 
+        val addNewSetButton: ImageButton = view.findViewById(R.id.btn_add_new_set)
+        addNewSetButton.setOnClickListener {
+            addNewSetRow()
+        }
+
+
+
         init()
     }
 
-    private fun startChronometer() {
-        chronometer.base = SystemClock.elapsedRealtime()
-        chronometer.start()
-        isChronometerRunning = true
+    private fun addNewSetRow() {
+        val tableLayout: TableLayout = binding.root.findViewById(R.id.tableLayout)
+        val newTableRow = TableRow(context)
 
-        val intent = Intent(context, ChronometerService::class.java).apply {
-            action = ChronometerService.ACTION_START
-            putExtra("BASE_TIME", chronometer.base)
+        val setNumberTextView = TextView(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f)
+            text = (tableLayout.childCount).toString() // Increment set number
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4)
         }
-        context?.startService(intent)
+
+        val repetitionsEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            hint = "Tekrar Sayısı"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setPadding(4)
+        }
+
+        val weightEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            hint = "Ağırlık (kg)"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setPadding(4)
+        }
+
+        val completedCheckBox = CheckBox(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4)
+        }
+
+        newTableRow.apply {
+            layoutParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            addView(setNumberTextView)
+            addView(repetitionsEditText)
+            addView(weightEditText)
+            addView(completedCheckBox)
+        }
+
+        tableLayout.addView(newTableRow)
     }
     private fun toggleChronometer() {
         if (isChronometerRunning) {
@@ -210,6 +283,8 @@ class EgzersizSecimFragment : Fragment() {
 
         fetchRoutineExercisesFromFirestore() // Ensure this is called after setting up the adapter
     }
+
+
     private fun finishRoutine() {
         val userId = userId
         val routineId = routineId
@@ -477,13 +552,12 @@ class EgzersizSecimFragment : Fragment() {
     }
     companion object {
         @JvmStatic
-        fun newInstance(routineId: String): EgzersizSecimFragment {
-            val fragment = EgzersizSecimFragment()
-            val args = Bundle().apply {
-                putString("routineId", routineId)
+        fun newInstance(routineId: String, elapsedTime: Long) =
+            EgzersizSecimFragment().apply {
+                arguments = Bundle().apply {
+                    putString("routineId", routineId)
+                    putLong("elapsedTime", elapsedTime)
+                }
             }
-            fragment.arguments = args
-            return fragment
-        }
     }
 }

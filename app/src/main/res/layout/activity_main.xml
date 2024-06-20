@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F2F2"
     tools:context=".MainActivity">
 
     <FrameLayout
@@ -19,16 +18,115 @@
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="62dp"
-        android:background="@color/c2"
-        app:itemIconSize="32dp"
-        app:itemTextAppearanceActive="@style/BottomNavigationTextStyle"
-        app:itemTextAppearanceInactive="@style/BottomNavigationTextStyle"
+        android:background="#252525"
+        app:itemIconSize="28dp"
+        app:itemTextAppearanceActive="@style/BottomNavigationTextStyleActive"
+        app:itemTextAppearanceInactive="@style/BottomNavigationTextStyleInactive"
+        app:itemIconTint="@color/c3"
+        app:itemTextColor="@color/c3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_nav"
         app:labelVisibilityMode="labeled"
         app:itemHorizontalTranslationEnabled="false" />
-    <include
+
+
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/overlay_layout"
-        layout="@layout/overlay_current_routine"
-        android:visibility="gone"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:visibility="visible"
+        android:padding="24dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.9"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/c1"
+        app:strokeColor="@color/c2"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/tv_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/c3"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="Şu an devam eden bir antrenmanınız var!"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/tv_elapsed_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/c2"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_light"
+                android:text="Geçen Süre: 00:00:00"
+                android:padding="4dp" />
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="20sp"
+                android:textColor="@color/c3"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="12dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_continue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="8dp"
+                    android:text="Devam Et"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:fontFamily="@font/roboto_regular"
+                    android:backgroundTint="@android:color/transparent"
+                    android:elevation="2dp"
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    app:cornerRadius="8dp"
+                    app:strokeColor="@android:color/holo_green_dark"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_finish"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Bitir"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:backgroundTint="@android:color/transparent"
+                    android:elevation="2dp"
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    app:cornerRadius="8dp"
+                    app:strokeColor="@android:color/holo_red_dark"
+                    app:strokeWidth="1dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
