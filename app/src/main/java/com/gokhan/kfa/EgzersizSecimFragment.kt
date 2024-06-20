@@ -5,17 +5,26 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.Chronometer
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RatingBar
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -109,13 +118,66 @@ class EgzersizSecimFragment : Fragment() {
             toggleChronometer()
         }
 
+        val addNewSetButton: ImageButton = view.findViewById(R.id.btn_add_new_set)
+        addNewSetButton.setOnClickListener {
+            addNewSetRow()
+        }
 
 
 
         init()
     }
 
+    private fun addNewSetRow() {
+        val tableLayout: TableLayout = binding.root.findViewById(R.id.tableLayout)
+        val newTableRow = TableRow(context)
 
+        val setNumberTextView = TextView(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f)
+            text = (tableLayout.childCount).toString() // Increment set number
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4)
+        }
+
+        val repetitionsEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            hint = "Tekrar Sayısı"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setPadding(4)
+        }
+
+        val weightEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            hint = "Ağırlık (kg)"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setPadding(4)
+        }
+
+        val completedCheckBox = CheckBox(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4)
+        }
+
+        newTableRow.apply {
+            layoutParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+            addView(setNumberTextView)
+            addView(repetitionsEditText)
+            addView(weightEditText)
+            addView(completedCheckBox)
+        }
+
+        tableLayout.addView(newTableRow)
+    }
     private fun toggleChronometer() {
         if (isChronometerRunning) {
             chronometerBaseTime = SystemClock.elapsedRealtime() - chronometer.base
