@@ -1,11 +1,19 @@
 package com.gokhan.kfa
 
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.TableLayout
+import android.widget.TableRow
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gokhan.kfa.databinding.FragmentEgzersizEkleBinding
@@ -61,6 +69,7 @@ class EgzersizEkleFragment : Fragment() {
                 context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
             },
             onDeleteClicked = {  },
+            onAddSetClicked = { exercise -> addNewSetRow(exercise) },
             isRoutineExercise = false // Egzersiz ekleme menüsü için false
         )
         binding.rvEgzersizListesi.adapter = exerciseAdapter
@@ -72,6 +81,71 @@ class EgzersizEkleFragment : Fragment() {
             addSelectedExercisesToRoutine()
         }
 
+    }
+
+    private fun addNewSetRow(exercise: Egzersiz) {
+        val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return
+
+        val newTableRow = TableRow(context).apply {
+            layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 4, 0, 4)
+            }
+        }
+
+        val setNumberTextView = TextView(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f).apply {
+                gravity = Gravity.CENTER
+            }
+            text = (tableLayout.childCount).toString()
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4, 4, 4, 4)
+        }
+
+        val repetitionsEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
+            hint = "Tekrar Sayısı"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setPadding(4, 4, 4, 4)
+        }
+
+        val weightEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
+            hint = "Ağırlık (kg)"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setPadding(8, 8, 8, 8)
+        }
+
+        val completedCheckBox = CheckBox(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(8, 8, 8, 8)
+        }
+
+        newTableRow.addView(setNumberTextView)
+        newTableRow.addView(repetitionsEditText)
+        newTableRow.addView(weightEditText)
+        newTableRow.addView(completedCheckBox)
+
+        tableLayout.addView(newTableRow)
+        Log.d("RutinFragment", "New set row added for exercise: ${exercise.name}")
     }
 
 
@@ -92,9 +166,6 @@ class EgzersizEkleFragment : Fragment() {
                 Log.w("FetchExercises", "Error fetching exercises", e)
             }
     }
-
-
-
 
 
     private fun addSelectedExercisesToRoutine() {
@@ -153,12 +224,6 @@ class EgzersizEkleFragment : Fragment() {
             }
         }
     }
-
-
-
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

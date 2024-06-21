@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateOverlayVisibility() {
-        if (routineViewModel.isRoutineActive.value == true && getCurrentFragment().let { it !is EgzersizSecimFragment && it !is EgzersizEkleFragment }) {
+        if (routineViewModel.isRoutineActive.value == true && getCurrentFragment().let { it !is RutinFragment && it !is EgzersizEkleFragment }) {
             overlayLayout.visibility = View.VISIBLE
         } else {
             overlayLayout.visibility = View.GONE
@@ -126,11 +126,11 @@ class MainActivity : AppCompatActivity() {
         saveRoutineDetails() // Call method to save routine details
     }
 
-    // Navigate to EgzersizSecimFragment
+    // Navigate to RutinFragment
     private fun navigateToEgzersizSecimFragment(routineId: String?) {
         routineId?.let {
             val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
-            val fragment = EgzersizSecimFragment.newInstance(it, elapsedTime)
+            val fragment = RutinFragment.newInstance(it, elapsedTime)
             supportFragmentManager.beginTransaction()
                 .replace(R.id.frame_layout, fragment)
                 .addToBackStack(null)

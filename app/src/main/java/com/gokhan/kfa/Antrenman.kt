@@ -75,7 +75,7 @@ class Antrenman : Fragment() {
             routineViewModel.startRoutine(routine.id)
             val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
             fragmentManager?.beginTransaction()
-                ?.replace(R.id.frame_layout, EgzersizSecimFragment.newInstance(routine.id, elapsedTime))
+                ?.replace(R.id.frame_layout, RutinFragment.newInstance(routine.id, elapsedTime))
                 ?.addToBackStack(null)
                 ?.commit()
         }
@@ -104,7 +104,7 @@ class Antrenman : Fragment() {
                 val activeRoutineId = routineViewModel.currentRoutineId
                 if (activeRoutineId != null) {
                     val elapsedTime = routineViewModel.elapsedTime.value ?: 0L
-                    val fragment = EgzersizSecimFragment.newInstance(activeRoutineId, elapsedTime)
+                    val fragment = RutinFragment.newInstance(activeRoutineId, elapsedTime)
                     fragmentManager?.beginTransaction()
                         ?.replace(R.id.frame_layout, fragment)
                         ?.addToBackStack(null)

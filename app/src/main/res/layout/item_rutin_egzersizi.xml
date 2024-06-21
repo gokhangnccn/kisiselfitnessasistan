@@ -5,8 +5,6 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:background="@drawable/item_border"
-    android:divider="?android:attr/dividerHorizontal"
-    android:showDividers="middle"
     android:focusable="true"
     android:layout_marginBottom="2dp">
 
@@ -55,7 +53,6 @@
                 android:fontFamily="sans-serif-light" />
         </LinearLayout>
 
-        <!-- Info Button with Text Below -->
         <LinearLayout
             android:id="@+id/info_layout"
             android:layout_width="wrap_content"
@@ -86,7 +83,6 @@
                 android:fontFamily="sans-serif-medium"
                 android:textSize="12sp" />
         </LinearLayout>
-
     </LinearLayout>
 
     <TableLayout
@@ -96,7 +92,6 @@
         android:stretchColumns="*"
         android:layout_marginTop="8dp">
 
-        <!-- Table Header -->
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,6 +103,8 @@
                 android:layout_weight="0.5"
                 android:text="Set"
                 android:textColor="@color/white"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:padding="4dp" />
@@ -118,6 +115,8 @@
                 android:layout_weight="1"
                 android:text="Tekrar"
                 android:textColor="@color/white"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:padding="4dp" />
@@ -128,6 +127,8 @@
                 android:layout_weight="1"
                 android:text="Ağırlık(kg)"
                 android:textColor="@color/white"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:padding="4dp" />
@@ -136,89 +137,80 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Completed"
+                android:text="Durum"
                 android:textColor="@color/white"
+                android:fontFamily="@font/roboto_bold"
+                android:textSize="16dp"
                 android:textStyle="bold"
                 android:gravity="center"
                 android:padding="4dp" />
         </TableRow>
 
-        <!-- Table Rows for Sets -->
         <TableRow
             android:id="@+id/set_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:paddingTop="4dp"
-            android:divider="?android:attr/dividerVertical"
-            android:showDividers="middle">
+            android:paddingTop="4dp">
 
-            <!-- Set Number -->
             <TextView
                 android:id="@+id/tv_set_number"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:text="1"
+                android:fontFamily="@font/roboto_bold"
                 android:textStyle="bold"
-                android:textSize="14sp"
+                android:textSize="18sp"
                 android:textColor="@color/c4"
-                android:gravity="center"
-                android:padding="4dp" />
+                android:gravity="center" />
 
-            <!-- Repetitions -->
             <EditText
                 android:id="@+id/et_repetitions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Tekrar Sayısı"
-                android:textSize="14sp"
+                android:fontFamily="@font/roboto_regular"
                 android:textColor="@color/c4"
+                android:textSize="14sp"
                 android:gravity="center"
-                android:inputType="number"
-                android:padding="4dp" />
+                android:inputType="numberDecimal" />
 
-            <!-- Weight -->
             <EditText
                 android:id="@+id/et_weight"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Ağırlık (kg)"
+                android:fontFamily="@font/roboto_regular"
                 android:textColor="@color/c4"
                 android:textSize="14sp"
                 android:gravity="center"
-                android:inputType="numberDecimal"
-                android:padding="4dp" />
+                android:inputType="numberDecimal" />
 
-            <!-- Completion Checkbox -->
             <CheckBox
                 android:id="@+id/cb_set_completed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/c4"
-                android:gravity="center"
-                android:padding="4dp" />
+                android:gravity="center" />
         </TableRow>
     </TableLayout>
 
-    <!-- Layout for Buttons -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp">
 
-        <!-- Add New Set Button Centered -->
         <ImageButton
             android:id="@+id/btn_add_new_set"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="center"
-            android:background="@drawable/icon_set_ekle" />
+            android:src="@drawable/icon_set_ekle"
+            app:tint="@android:color/holo_green_dark" />
 
-        <!-- Remove Exercise Button Bottom Right -->
         <ImageButton
             android:id="@+id/btn_remove_exercise_from_routine"
             android:layout_width="36dp"
