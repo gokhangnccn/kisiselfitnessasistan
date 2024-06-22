@@ -2,6 +2,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gokhan.kfa.Egzersiz
 import kotlinx.coroutines.launch
 
 class RoutineViewModel : ViewModel() {
@@ -16,6 +17,10 @@ class RoutineViewModel : ViewModel() {
     val finishRoutineEvent: LiveData<Unit> get() = _finishRoutineEvent
 
     private var startTime: Long = 0
+
+    private val _selectedRoutineExercises = MutableLiveData<List<Egzersiz>>()
+    val selectedRoutineExercises: LiveData<List<Egzersiz>> = _selectedRoutineExercises
+
 
     // Add a property to store the current routine ID
     var currentRoutineId: String? = null
@@ -49,7 +54,9 @@ class RoutineViewModel : ViewModel() {
         }
     }
 
-
+    fun updateSelectedRoutineExercises(exercises: List<Egzersiz>) {
+        _selectedRoutineExercises.value = exercises
+    }
     fun stopRoutine() {
         _isRoutineActive.value = false
     }

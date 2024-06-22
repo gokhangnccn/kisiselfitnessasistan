@@ -54,6 +54,10 @@ class RutinFragment : Fragment() {
 
     private val routineViewModel: RoutineViewModel by activityViewModels()
 
+    private var exerciseSetsMap: MutableMap<String, MutableList<Map<String, Any>>> = mutableMapOf()
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -86,6 +90,14 @@ class RutinFragment : Fragment() {
                 chronometer.start()
             }
         }
+        // Observe LiveData in onViewCreated or onCreateView
+        routineViewModel.selectedRoutineExercises.observe(viewLifecycleOwner) { exercises ->
+            // Update UI with exercises
+            selectedRoutineExercises.clear()
+            selectedRoutineExercises.addAll(exercises)
+            exerciseAdapter.notifyDataSetChanged()
+        }
+
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -115,6 +127,7 @@ class RutinFragment : Fragment() {
         }
 
         init()
+    loadExerciseSets() // Load sets when view is created
     }
 
     private fun init() {
@@ -169,20 +182,11 @@ class RutinFragment : Fragment() {
     private fun addNewSetRow(exercise: Egzersiz) {
         val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return
 
-        val newTableRow = TableRow(context).apply {
-            layoutParams = TableLayout.LayoutParams(
-                TableLayout.LayoutParams.MATCH_PARENT,
-                TableLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 8, 0, 8)
-            }
-        }
-
         val setNumberTextView = TextView(context).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f).apply {
                 gravity = Gravity.CENTER
             }
-            text = (tableLayout.childCount + 1).toString()
+            text = (tableLayout.childCount).toString() // Count of existing child rows
             textSize = 18f
             setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
             gravity = Gravity.CENTER
@@ -223,10 +227,18 @@ class RutinFragment : Fragment() {
             })
         }
 
-        newTableRow.addView(setNumberTextView)
-        newTableRow.addView(repetitionsEditText)
-        newTableRow.addView(weightEditText)
-        newTableRow.addView(completedCheckBoxContainer)
+        val newTableRow = TableRow(context).apply {
+            layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 8, 0, 8)
+            }
+            addView(setNumberTextView)
+            addView(repetitionsEditText)
+            addView(weightEditText)
+            addView(completedCheckBoxContainer)
+        }
 
         tableLayout.addView(newTableRow)
 
@@ -237,23 +249,28 @@ class RutinFragment : Fragment() {
             "weight" to weightEditText.text.toString(),
             "completed" to false // Initially, the set is not completed
         )
+        exercise.id?.let { exerciseId ->
+            // Add the set data to exerciseSetsMap for local tracking
+            exerciseSetsMap.getOrPut(exerciseId) { mutableListOf() }.add(setData)
 
-        userId?.let { userId ->
-            routineId?.let { routineId ->
-                db.collection("users").document(userId)
-                    .collection("routines").document(routineId)
-                    .collection("exercises").document(exercise.id!!)
-                    .collection("sets").add(setData)
-                    .addOnSuccessListener {
-                        Log.d("RutinFragment", "New set added for exercise: ${exercise.name}")
-                        fetchExerciseSetsFromFirestore(exercise) // Fetch updated sets
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("RutinFragment", "Error adding new set", e)
-                    }
+            userId?.let { userId ->
+                routineId?.let { routineId ->
+                    db.collection("users").document(userId)
+                        .collection("routines").document(routineId)
+                        .collection("exercises").document(exercise.id!!)
+                        .collection("sets").add(setData)
+                        .addOnSuccessListener {
+                            Log.d("RutinFragment", "New set added for exercise: ${exercise.name}")
+                            fetchExerciseSetsFromFirestore(exercise) // Fetch updated sets
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("RutinFragment", "Error adding new set", e)
+                        }
+                }
             }
         }
     }
+
 
 
 
@@ -286,12 +303,15 @@ class RutinFragment : Fragment() {
                     .collection("exercises").document(exercise.id!!)
                     .collection("sets").get()
                     .addOnSuccessListener { result ->
-                        val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return@addOnSuccessListener
-                        tableLayout.removeAllViews() // Önceki setleri temizleyin
+                        val setsList = mutableListOf<Map<String, Any>>()
                         for (document in result) {
                             val setData = document.data
-                            addSetRowToTable(tableLayout, setData)
+                            setsList.add(setData)
                         }
+                        exerciseSetsMap[exercise.id!!] = setsList
+
+                        // Update UI
+                        updateSetsUI(exercise)
                     }
                     .addOnFailureListener { e ->
                         Log.e("RutinFragment", "Error fetching sets for exercise: ${exercise.name}", e)
@@ -299,6 +319,16 @@ class RutinFragment : Fragment() {
             }
         }
     }
+
+    private fun updateSetsUI(exercise: Egzersiz) {
+        val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return
+        tableLayout.removeAllViews()
+
+        exerciseSetsMap[exercise.id]?.forEachIndexed { index, setData ->
+            addSetRowToTable(tableLayout, setData)
+        }
+    }
+
 
     private fun addSetRowToTable(tableLayout: TableLayout, setData: Map<String, Any>) {
         val newTableRow = TableRow(context).apply {
@@ -370,8 +400,6 @@ class RutinFragment : Fragment() {
 
 
 
-
-
     private fun toggleChronometer() {
         if (isChronometerRunning) {
             chronometerBaseTime = SystemClock.elapsedRealtime() - chronometer.base
@@ -407,8 +435,8 @@ class RutinFragment : Fragment() {
         if (isChronometerRunning) {
             chronometer.base = SystemClock.elapsedRealtime() - chronometerBaseTime
             chronometer.start()
-            loadExerciseSets()
         }
+        loadExerciseSets()
     }
 
     private fun fadeInView(view: View) {

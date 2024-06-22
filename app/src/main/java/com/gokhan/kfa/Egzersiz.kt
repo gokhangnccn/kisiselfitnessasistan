@@ -10,6 +10,7 @@ data class Egzersiz(
     val targetMuscleGroups: List<String>? = null,
     val secondaryTargetMuscleGroups: List<String>? = null,
     val gifUrl: String = ""
+
 )
 
 
