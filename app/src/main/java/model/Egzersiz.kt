@@ -1,5 +1,5 @@
 // Egzersiz.kt
-package com.gokhan.kfa
+package model
 
 data class Egzersiz(
     var id: String = "",
@@ -10,6 +10,7 @@ data class Egzersiz(
     val targetMuscleGroups: List<String>? = null,
     val secondaryTargetMuscleGroups: List<String>? = null,
     val gifUrl: String = ""
+
 )
 
 

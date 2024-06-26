@@ -1,5 +1,7 @@
 // Routine.kt
-package com.gokhan.kfa
+package model
+
+import model.Egzersiz
 
 data class Routine(
     var id: String = "",

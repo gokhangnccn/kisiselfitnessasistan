@@ -1,4 +1,4 @@
-package com.gokhan.kfa
+package adapter
 
 import android.text.Spannable
 import android.text.SpannableString
@@ -20,6 +20,8 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import model.Egzersiz
+import com.gokhan.kfa.R
 import com.gokhan.kfa.databinding.ItemEgzersizSecimBinding
 import com.gokhan.kfa.databinding.ItemRutinEgzersiziBinding
 
@@ -29,7 +31,7 @@ class EgzersizAdapter(
     private val onExerciseClicked: (Egzersiz) -> Unit,
     private val onInfoClicked: (Egzersiz) -> Unit,
     private val onDeleteClicked: (Egzersiz) -> Unit,
-
+    private val onAddSetClicked: (Egzersiz) -> Unit,
     private val isRoutineExercise: Boolean
 ) : RecyclerView.Adapter<EgzersizAdapter.EgzersizViewHolder>() {
 
@@ -41,7 +43,7 @@ class EgzersizAdapter(
         } else {
             ItemEgzersizSecimBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         }
-        return EgzersizViewHolder(binding, onInfoClicked)
+        return EgzersizViewHolder(binding, onInfoClicked, onAddSetClicked)
     }
 
     override fun onBindViewHolder(holder: EgzersizViewHolder, position: Int) {
@@ -66,10 +68,7 @@ class EgzersizAdapter(
             } else {
                 selectedExercises.remove(exercise)
             }
-            Log.d("EgzersizAdapter", "Selected exercises: ${selectedExercises.size}")
         }
-
-
     }
 
     override fun getItemCount() = exercises.size
@@ -82,19 +81,21 @@ class EgzersizAdapter(
         exercises.clear()
         exercises.addAll(newExercises)
         notifyDataSetChanged()
-        Log.d("EgzersizAdapter", "Adapter updated with ${exercises.size} exercises")
     }
 
-    class EgzersizViewHolder(
+    inner class EgzersizViewHolder(
         private val binding: ViewBinding,
-        private val onInfoClicked: (Egzersiz) -> Unit
-
+        private val onInfoClicked: (Egzersiz) -> Unit,
+        private val onAddSetClicked: (Egzersiz) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         val checkBox: CheckBox = if (binding is ItemEgzersizSecimBinding) binding.cbSelectExercise else (binding as ItemRutinEgzersiziBinding).cbSetCompleted
         val removeButton: ImageButton? = when (binding) {
             is ItemRutinEgzersiziBinding -> binding.btnRemoveExerciseFromRoutine
             else -> null
         }
+        val addSetButton: ImageButton? = if (isRoutineExercise) {
+            (binding as ItemRutinEgzersiziBinding).btnAddNewSet
+        } else null
 
 
         fun bind(exercise: Egzersiz) {
@@ -204,6 +205,9 @@ class EgzersizAdapter(
                     }
                     binding.ivInfoText.setOnClickListener {
                         onInfoClicked(exercise)
+                    }
+                    addSetButton?.setOnClickListener {
+                        onAddSetClicked(exercise)
                     }
                 }
             }
