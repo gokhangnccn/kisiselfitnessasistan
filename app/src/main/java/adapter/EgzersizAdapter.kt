@@ -1,4 +1,4 @@
-package com.gokhan.kfa
+package adapter
 
 import android.text.Spannable
 import android.text.SpannableString
@@ -20,6 +20,8 @@ import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import model.Egzersiz
+import com.gokhan.kfa.R
 import com.gokhan.kfa.databinding.ItemEgzersizSecimBinding
 import com.gokhan.kfa.databinding.ItemRutinEgzersiziBinding
 

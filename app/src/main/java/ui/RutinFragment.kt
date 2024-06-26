@@ -1,6 +1,6 @@
-package com.gokhan.kfa
+package ui
 
-import RoutineViewModel
+import adapter.EgzersizAdapter
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -29,11 +29,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.gokhan.kfa.ChronometerService
+import com.gokhan.kfa.DialogUtils
+import com.gokhan.kfa.R
 import com.gokhan.kfa.databinding.FragmentRutinBinding
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import model.Egzersiz
+import model.Routine
+import viewModel.RoutineViewModel
 
 class RutinFragment : Fragment() {
 

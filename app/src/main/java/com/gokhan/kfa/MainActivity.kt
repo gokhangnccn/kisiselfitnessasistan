@@ -1,6 +1,6 @@
 package com.gokhan.kfa
 
-import RoutineViewModel
+import viewModel.RoutineViewModel
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -14,6 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.gokhan.kfa.databinding.ActivityMainBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.firebase.auth.FirebaseAuth
+import ui.AntrenmanFragment
+import ui.EgzersizEkleFragment
+import ui.RutinFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.antrenman -> {
-                    replaceFragment(Antrenman.newInstance())
+                    replaceFragment(AntrenmanFragment.newInstance())
                     true
                 }
                 else -> false

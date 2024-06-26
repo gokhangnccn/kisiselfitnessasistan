@@ -1,13 +1,15 @@
+package viewModel
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gokhan.kfa.Egzersiz
 import kotlinx.coroutines.launch
+import model.Egzersiz
 
 class RoutineViewModel : ViewModel() {
 
-    private val _isRoutineActive = MutableLiveData<Boolean>()
+    private val _isRoutineActive = MutableLiveData(false)
     val isRoutineActive: LiveData<Boolean> get() = _isRoutineActive
 
     private val _elapsedTime = MutableLiveData<Long>()

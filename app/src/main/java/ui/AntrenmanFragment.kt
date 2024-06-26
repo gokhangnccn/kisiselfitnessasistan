@@ -1,7 +1,6 @@
-package com.gokhan.kfa
+package ui
 
-import RoutineAdapter
-import RoutineViewModel
+import adapter.RoutineAdapter
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
@@ -14,11 +13,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gokhan.kfa.R
 import com.gokhan.kfa.databinding.FragmentAntrenmanBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import model.Routine
+import viewModel.RoutineViewModel
 
-class Antrenman : Fragment() {
+class AntrenmanFragment : Fragment() {
 
     private var _binding: FragmentAntrenmanBinding? = null
     private val binding get() = _binding!!
@@ -163,7 +165,7 @@ class Antrenman : Fragment() {
                         "Rutin oluşturulurken hata oluştu: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    Log.e("Antrenman", "Error creating routine", e)
+                    Log.e("AntrenmanFragment", "Error creating routine", e)
                 }
         }
     }
@@ -182,7 +184,7 @@ class Antrenman : Fragment() {
                     routineAdapter.notifyDataSetChanged()
                 }
                 .addOnFailureListener { e ->
-                    Log.w("Antrenman", "Error fetching routines", e)
+                    Log.w("AntrenmanFragment", "Error fetching routines", e)
                 }
         }
     }
@@ -208,7 +210,7 @@ class Antrenman : Fragment() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Rutinler silinirken hata oluştu: ${e.message}", Toast.LENGTH_SHORT).show()
-                Log.e("Antrenman", "Error deleting routines", e)
+                Log.e("AntrenmanFragment", "Error deleting routines", e)
             }
     }
 
@@ -218,8 +220,8 @@ class Antrenman : Fragment() {
     }
 
     companion object {
-        fun newInstance(): Antrenman {
-            return Antrenman()
+        fun newInstance(): AntrenmanFragment {
+            return AntrenmanFragment()
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.gokhan.kfa.databinding.DialogEgzersizDetayBinding
+import model.Egzersiz
 
 object DialogUtils {
     fun showExerciseDetailsDialog(context: Context, exercise: Egzersiz) {

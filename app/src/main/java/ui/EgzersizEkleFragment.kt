@@ -1,5 +1,6 @@
-package com.gokhan.kfa
+package ui
 
+import adapter.EgzersizAdapter
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -16,9 +17,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gokhan.kfa.DialogUtils
+import com.gokhan.kfa.R
 import com.gokhan.kfa.databinding.FragmentEgzersizEkleBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import model.Egzersiz
 
 class EgzersizEkleFragment : Fragment() {
 

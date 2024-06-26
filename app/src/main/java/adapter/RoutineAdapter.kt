@@ -1,3 +1,5 @@
+package adapter
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -6,7 +8,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.gokhan.kfa.R
-import com.gokhan.kfa.Routine
+import model.Routine
 
 class RoutineAdapter(
     private val routines: MutableList<Routine>,

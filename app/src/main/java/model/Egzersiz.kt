@@ -1,5 +1,5 @@
 // Egzersiz.kt
-package com.gokhan.kfa
+package model
 
 data class Egzersiz(
     var id: String = "",
