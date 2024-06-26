@@ -1,6 +1,6 @@
-package com.gokhan.kfa
+package ui
 
-import RoutineViewModel
+import adapter.EgzersizAdapter
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -16,33 +16,37 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.Chronometer
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RatingBar
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.gokhan.kfa.databinding.FragmentEgzersizSecimBinding
+import com.gokhan.kfa.ChronometerService
+import com.gokhan.kfa.DialogUtils
+import com.gokhan.kfa.R
+import com.gokhan.kfa.databinding.FragmentRutinBinding
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import model.Egzersiz
+import model.Routine
+import viewModel.RoutineViewModel
 
-class EgzersizSecimFragment : Fragment() {
+class RutinFragment : Fragment() {
 
-    private var _binding: FragmentEgzersizSecimBinding? = null
+    private var _binding: FragmentRutinBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: FirebaseFirestore
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
 
     private val selectedRoutineExercises = mutableListOf<Egzersiz>()
     private lateinit var exerciseAdapter: EgzersizAdapter
@@ -56,11 +60,15 @@ class EgzersizSecimFragment : Fragment() {
 
     private val routineViewModel: RoutineViewModel by activityViewModels()
 
+    private var exerciseSetsMap: MutableMap<String, MutableList<Map<String, Any>>> = mutableMapOf()
+
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentEgzersizSecimBinding.inflate(inflater, container, false)
+        _binding = FragmentRutinBinding.inflate(inflater, container, false)
         db = FirebaseFirestore.getInstance()
         userId = auth.currentUser?.uid
         return binding.root
@@ -88,7 +96,13 @@ class EgzersizSecimFragment : Fragment() {
                 chronometer.start()
             }
         }
-
+        // Observe LiveData in onViewCreated or onCreateView
+        routineViewModel.selectedRoutineExercises.observe(viewLifecycleOwner) { exercises ->
+            // Update UI with exercises
+            selectedRoutineExercises.clear()
+            selectedRoutineExercises.addAll(exercises)
+            exerciseAdapter.notifyDataSetChanged()
+        }
 
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -118,66 +132,280 @@ class EgzersizSecimFragment : Fragment() {
             toggleChronometer()
         }
 
-        val addNewSetButton: ImageButton = view.findViewById(R.id.btn_add_new_set)
-        addNewSetButton.setOnClickListener {
-            addNewSetRow()
-        }
-
-
-
         init()
+    loadExerciseSets() // Load sets when view is created
     }
 
-    private fun addNewSetRow() {
-        val tableLayout: TableLayout = binding.root.findViewById(R.id.tableLayout)
-        val newTableRow = TableRow(context)
+    private fun init() {
+        binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
+        exerciseAdapter = EgzersizAdapter(
+            selectedRoutineExercises,
+            onExerciseClicked = { exercise -> /* Handle click */ },
+            onInfoClicked = { exercise ->
+                context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
+            },
+            onDeleteClicked = { exercise -> deleteExercise(exercise) },
+            onAddSetClicked = { exercise -> addNewSetRow(exercise) },
+            isRoutineExercise = true
+        )
+        binding.rvAktifEgzersizler.adapter = exerciseAdapter
+
+        binding.btnRutineEgzersizEkle.setOnClickListener {
+            routineId?.let {
+                fragmentManager?.beginTransaction()
+                    ?.replace(R.id.frame_layout, EgzersizEkleFragment.newInstance(it))
+                    ?.addToBackStack(null)
+                    ?.commit()
+            }
+        }
+
+        // Find the edit button and set its OnClickListener
+        binding.btnEditRoutine.setOnClickListener {
+            routineId?.let { id ->
+                showEditRoutineDialog(id)
+            }
+        }
+
+        routineId?.let { id ->
+            db.collection("users").document(userId!!).collection("routines").document(id).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val routine = document.toObject(Routine::class.java)
+                        routine?.let {
+                            // Update routine name and description
+                            binding.tvRoutineName.text = it.name
+                            binding.tvRoutineDescription.text = it.description
+                        }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("RutinFragment", "Error fetching routine details", e)
+                }
+        }
+
+        fetchRoutineExercisesFromFirestore()
+    }
+    private fun addNewSetRow(exercise: Egzersiz) {
+        val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return
 
         val setNumberTextView = TextView(context).apply {
-            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f)
-            text = (tableLayout.childCount).toString() // Increment set number
-            textSize = 14f
-            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f).apply {
+                gravity = Gravity.CENTER
+            }
+            text = (tableLayout.childCount).toString() // Count of existing child rows
+            textSize = 18f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
             gravity = Gravity.CENTER
-            setPadding(4)
+            setPadding(4, 4, 4, 4)
         }
 
         val repetitionsEditText = EditText(context).apply {
-            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
             hint = "Tekrar Sayısı"
             textSize = 14f
-            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
             gravity = Gravity.CENTER
             inputType = InputType.TYPE_CLASS_NUMBER
-            setPadding(4)
+            setPadding(4, 32, 4, 32)
         }
 
         val weightEditText = EditText(context).apply {
-            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
             hint = "Ağırlık (kg)"
             textSize = 14f
-            setTextColor(ContextCompat.getColor(context, R.color.c4))
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
             gravity = Gravity.CENTER
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-            setPadding(4)
+            setPadding(4, 32, 4, 32)
         }
 
-        val completedCheckBox = CheckBox(context).apply {
+        val completedCheckBoxContainer = LinearLayout(context).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-            setTextColor(ContextCompat.getColor(context, R.color.c4))
             gravity = Gravity.CENTER
-            setPadding(4)
+            orientation = LinearLayout.HORIZONTAL
+            addView(CheckBox(context).apply {
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+                gravity = Gravity.CENTER
+            })
         }
 
-        newTableRow.apply {
-            layoutParams = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
+        val newTableRow = TableRow(context).apply {
+            layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 8, 0, 8)
+            }
             addView(setNumberTextView)
             addView(repetitionsEditText)
             addView(weightEditText)
-            addView(completedCheckBox)
+            addView(completedCheckBoxContainer)
         }
 
         tableLayout.addView(newTableRow)
+
+        // Save the new set data to Firestore
+        val setData = hashMapOf(
+            "setNumber" to setNumberTextView.text.toString(),
+            "repetitions" to repetitionsEditText.text.toString(),
+            "weight" to weightEditText.text.toString(),
+            "completed" to false // Initially, the set is not completed
+        )
+        exercise.id?.let { exerciseId ->
+            // Add the set data to exerciseSetsMap for local tracking
+            exerciseSetsMap.getOrPut(exerciseId) { mutableListOf() }.add(setData)
+
+            userId?.let { userId ->
+                routineId?.let { routineId ->
+                    db.collection("users").document(userId)
+                        .collection("routines").document(routineId)
+                        .collection("exercises").document(exercise.id!!)
+                        .collection("sets").add(setData)
+                        .addOnSuccessListener {
+                            Log.d("RutinFragment", "New set added for exercise: ${exercise.name}")
+                            fetchExerciseSetsFromFirestore(exercise) // Fetch updated sets
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("RutinFragment", "Error adding new set", e)
+                        }
+                }
+            }
+        }
     }
+
+
+
+
+    private fun loadExerciseSets() {
+        Log.d("RutinFragment", "Loading exercise sets")
+        userId?.let { userId ->
+            routineId?.let { routineId ->
+                db.collection("users").document(userId)
+                    .collection("routines").document(routineId)
+                    .collection("exercises").get()
+                    .addOnSuccessListener { result ->
+                        for (document in result) {
+                            val exercise = document.toObject(Egzersiz::class.java)
+                            fetchExerciseSetsFromFirestore(exercise)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("RutinFragment", "Error fetching exercises", e)
+                    }
+            }
+        }
+    }
+
+
+    private fun fetchExerciseSetsFromFirestore(exercise: Egzersiz) {
+        userId?.let { userId ->
+            routineId?.let { routineId ->
+                db.collection("users").document(userId)
+                    .collection("routines").document(routineId)
+                    .collection("exercises").document(exercise.id!!)
+                    .collection("sets").get()
+                    .addOnSuccessListener { result ->
+                        val setsList = mutableListOf<Map<String, Any>>()
+                        for (document in result) {
+                            val setData = document.data
+                            setsList.add(setData)
+                        }
+                        exerciseSetsMap[exercise.id!!] = setsList
+
+                        // Update UI
+                        updateSetsUI(exercise)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("RutinFragment", "Error fetching sets for exercise: ${exercise.name}", e)
+                    }
+            }
+        }
+    }
+
+    private fun updateSetsUI(exercise: Egzersiz) {
+        val tableLayout: TableLayout = view?.findViewById(R.id.tableLayout) ?: return
+        tableLayout.removeAllViews()
+
+        exerciseSetsMap[exercise.id]?.forEachIndexed { index, setData ->
+            addSetRowToTable(tableLayout, setData)
+        }
+    }
+
+
+    private fun addSetRowToTable(tableLayout: TableLayout, setData: Map<String, Any>) {
+        val newTableRow = TableRow(context).apply {
+            layoutParams = TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 8, 0, 8)
+            }
+        }
+
+        val setNumberTextView = TextView(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 0.5f).apply {
+                gravity = Gravity.CENTER
+            }
+            text = setData["setNumber"].toString()
+            textSize = 18f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            setPadding(4, 4, 4, 4)
+        }
+
+        val repetitionsEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
+            hint = "Tekrar Sayısı"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setPadding(4, 32, 4, 32)
+            setText(setData["repetitions"].toString())
+        }
+
+        val weightEditText = EditText(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f).apply {
+                gravity = Gravity.CENTER
+            }
+            hint = "Ağırlık (kg)"
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+            gravity = Gravity.CENTER
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setPadding(4, 32, 4, 32)
+            setText(setData["weight"].toString())
+        }
+
+        val completedCheckBoxContainer = LinearLayout(context).apply {
+            layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            gravity = Gravity.CENTER
+            orientation = LinearLayout.HORIZONTAL
+            addView(CheckBox(context).apply {
+                setTextColor(ContextCompat.getColor(requireContext(), R.color.c4))
+                gravity = Gravity.CENTER
+                isChecked = setData["completed"] as Boolean
+            })
+        }
+
+        newTableRow.addView(setNumberTextView)
+        newTableRow.addView(repetitionsEditText)
+        newTableRow.addView(weightEditText)
+        newTableRow.addView(completedCheckBoxContainer)
+
+        tableLayout.addView(newTableRow)
+    }
+
+
+
+
+
     private fun toggleChronometer() {
         if (isChronometerRunning) {
             chronometerBaseTime = SystemClock.elapsedRealtime() - chronometer.base
@@ -214,6 +442,7 @@ class EgzersizSecimFragment : Fragment() {
             chronometer.base = SystemClock.elapsedRealtime() - chronometerBaseTime
             chronometer.start()
         }
+        loadExerciseSets()
     }
 
     private fun fadeInView(view: View) {
@@ -234,55 +463,6 @@ class EgzersizSecimFragment : Fragment() {
         }
     }
 
-    private fun init() {
-        binding.rvAktifEgzersizler.layoutManager = LinearLayoutManager(context)
-        exerciseAdapter = EgzersizAdapter(
-            selectedRoutineExercises,
-            onExerciseClicked = { exercise -> /* Handle click */ },
-            onInfoClicked = { exercise ->
-                context?.let { DialogUtils.showExerciseDetailsDialog(it, exercise) }
-            },
-            onDeleteClicked = { exercise -> deleteExercise(exercise) }, // Added delete action
-            isRoutineExercise = true // For exercise selection menu
-        )
-        binding.rvAktifEgzersizler.adapter = exerciseAdapter
-
-        binding.btnRutineEgzersizEkle.setOnClickListener {
-            routineId?.let {
-                fragmentManager?.beginTransaction()
-                    ?.replace(R.id.frame_layout, EgzersizEkleFragment.newInstance(it))
-                    ?.addToBackStack(null)
-                    ?.commit()
-            }
-        }
-
-
-        // Find the edit button and set its OnClickListener
-        binding.btnEditRoutine.setOnClickListener {
-            routineId?.let { id ->
-                showEditRoutineDialog(id)
-            }
-        }
-
-        routineId?.let { id ->
-            db.collection("users").document(userId!!).collection("routines").document(id).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val routine = document.toObject(Routine::class.java)
-                        routine?.let {
-                            // Update routine name and description
-                            binding.tvRoutineName.text = it.name
-                            binding.tvRoutineDescription.text = it.description
-                        }
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("EgzersizSecimFragment", "Error fetching routine details", e)
-                }
-        }
-
-        fetchRoutineExercisesFromFirestore() // Ensure this is called after setting up the adapter
-    }
 
 
     private fun finishRoutine() {
@@ -291,7 +471,7 @@ class EgzersizSecimFragment : Fragment() {
         val context = context
 
         if (userId == null || routineId == null || context == null) {
-            Log.e("EgzersizSecimFragment", "User ID, Routine ID, or Context is null")
+            Log.e("RutinFragment", "User ID, Routine ID, or Context is null")
             Toast.makeText(context, "Eksik bilgi. Lütfen tekrar deneyin.", Toast.LENGTH_SHORT).show()
             return
         }
@@ -302,13 +482,13 @@ class EgzersizSecimFragment : Fragment() {
         routineRef.get()
             .addOnSuccessListener { document ->
                 if (!document.exists()) {
-                    Log.e("EgzersizSecimFragment", "Routine document does not exist")
+                    Log.e("RutinFragment", "Routine document does not exist")
                     return@addOnSuccessListener
                 }
 
                 val routine = document.toObject(Routine::class.java)
                 if (routine == null) {
-                    Log.e("EgzersizSecimFragment", "Routine object is null")
+                    Log.e("RutinFragment", "Routine object is null")
                     return@addOnSuccessListener
                 }
 
@@ -372,11 +552,11 @@ class EgzersizSecimFragment : Fragment() {
                                 activity?.finish() // Close the fragment or navigate back
                             }
                             .addOnFailureListener { e ->
-                                Log.e("EgzersizSecimFragment", "Error adding exercises", e)
+                                Log.e("RutinFragment", "Error adding exercises", e)
                                 Toast.makeText(context, "Egzersizler eklenirken bir hata oluştu", Toast.LENGTH_SHORT).show()
                             }
                     }.addOnFailureListener { e ->
-                        Log.e("EgzersizSecimFragment", "Error finishing exercise routine", e)
+                        Log.e("RutinFragment", "Error finishing exercise routine", e)
                         Toast.makeText(context, "Egzersiz rutini tamamlanırken bir hata oluştu", Toast.LENGTH_SHORT).show()
                     }
 
@@ -386,7 +566,7 @@ class EgzersizSecimFragment : Fragment() {
                 alertDialog.show()
             }
             .addOnFailureListener { e ->
-                Log.e("EgzersizSecimFragment", "Error fetching routine details", e)
+                Log.e("RutinFragment", "Error fetching routine details", e)
                 Toast.makeText(context, "Rutin detayları alınırken bir hata oluştu", Toast.LENGTH_SHORT).show()
             }
     }
@@ -462,7 +642,7 @@ class EgzersizSecimFragment : Fragment() {
                 fetchUpdatedRoutineDetails(routineId)
             }
             .addOnFailureListener { e ->
-                Log.e("EgzersizSecimFragment", "Error updating routine details", e)
+                Log.e("RutinFragment", "Error updating routine details", e)
                 Toast.makeText(context, "Rutin güncellenirken bir hata oluştu", Toast.LENGTH_SHORT).show()
             }
     }
@@ -482,13 +662,13 @@ class EgzersizSecimFragment : Fragment() {
                     }
                 }
                 .addOnFailureListener { e ->
-                    Log.e("EgzersizSecimFragment", "Error fetching updated routine details", e)
+                    Log.e("RutinFragment", "Error fetching updated routine details", e)
                 }
         }
     }
 
     private fun fetchRoutineExercisesFromFirestore() {
-        Log.d("EgzersizSecimFragment", "Fetching routine exercises")
+        Log.d("RutinFragment", "Fetching routine exercises")
         userId?.let { userId ->
             routineId?.let { routineId ->
                 db.collection("users").document(userId)
@@ -500,19 +680,25 @@ class EgzersizSecimFragment : Fragment() {
                             val exercise = document.toObject(Egzersiz::class.java)
                             exercise.id = document.id
                             routineExercises.add(exercise)
-                            Log.d("EgzersizSecimFragment", "Fetched exercise: ${exercise.name} with ID: ${exercise.id}")
+                            Log.d("RutinFragment", "Fetched exercise: ${exercise.name} with ID: ${exercise.id}")
                         }
                         selectedRoutineExercises.clear()
                         selectedRoutineExercises.addAll(routineExercises)
                         exerciseAdapter.notifyDataSetChanged()
-                        Log.d("EgzersizSecimFragment", "RecyclerView updated with ${selectedRoutineExercises.size} exercises")
+                        Log.d("RutinFragment", "RecyclerView updated with ${selectedRoutineExercises.size} exercises")
+
+                        // Fetch sets for each exercise
+                        selectedRoutineExercises.forEach { exercise ->
+                            fetchExerciseSetsFromFirestore(exercise)
+                        }
                     }
                     .addOnFailureListener { e ->
-                        Log.e("EgzersizSecimFragment", "Error fetching routine exercises", e)
+                        Log.e("RutinFragment", "Error fetching routine exercises", e)
                     }
             }
         }
     }
+
     private fun deleteExercise(exercise: Egzersiz) {
         // Implement your delete logic here
         // For example, show confirmation dialog or directly delete from Firestore
@@ -534,7 +720,7 @@ class EgzersizSecimFragment : Fragment() {
                             exerciseAdapter.notifyDataSetChanged()
                         }
                         .addOnFailureListener { e ->
-                            Log.e("EgzersizSecimFragment", "Error deleting exercise", e)
+                            Log.e("RutinFragment", "Error deleting exercise", e)
                             Toast.makeText(context, "Egzersiz silinirken bir hata oluştu", Toast.LENGTH_SHORT).show()
                         }
                 }
@@ -553,7 +739,7 @@ class EgzersizSecimFragment : Fragment() {
     companion object {
         @JvmStatic
         fun newInstance(routineId: String, elapsedTime: Long) =
-            EgzersizSecimFragment().apply {
+            RutinFragment().apply {
                 arguments = Bundle().apply {
                     putString("routineId", routineId)
                     putLong("elapsedTime", elapsedTime)
